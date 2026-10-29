@@ -1,0 +1,1 @@
+ok so if a player presses space then jump  
