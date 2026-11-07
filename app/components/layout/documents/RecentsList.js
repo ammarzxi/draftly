@@ -1,34 +1,26 @@
 "use client";
 
-import {
-  FileText,
-  ChevronDown,
-  Pencil,
-  Folder,
-  Dot,
-  Star,
-  MoreVertical,
-  Trash,
-} from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useGlobal } from "@/app/context/GlobalVars";
-import { getTypeStyle } from "../../../utils/documents";
-
-
-const now = Date.now();
+import DocumentRow from "./DocumentRow";
 
 export default function RecentsList({
   handleSelectFolder,
   handleSelectDocument,
   popup,
   setPopup,
-  folDocs,
   selectedFolder,
   setEditable,
 }) {
-  const [deleteId, setDeleteId] = useState(null);
-
-  const { mode, setMode, items, setItems } = useGlobal();
+  const {
+    mode,
+    setMode,
+    items,
+    editDocument,
+    editFolder,
+    deleteDocument,
+    deleteFolder,
+  } = useGlobal();
 
   useEffect(() => {
     const handleClick = (event) => {
@@ -39,24 +31,13 @@ export default function RecentsList({
 
     document.addEventListener("click", handleClick);
 
-    return () => {
-      document.removeEventListener("click", handleClick);
-    };
+    return () => document.removeEventListener("click", handleClick);
   }, [setPopup]);
 
   const foldersData = items.filter((item) => item.type === "Folder");
-
-  const toggleStar = (id) => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id == id ? { ...item, starred: !item.starred } : item,
-      ),
-    );
-  };
-
-  const handleDelete = (id) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  };
+  const visibleItems = items
+    .filter((item) => item.deletedAt === null)
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
@@ -64,379 +45,125 @@ export default function RecentsList({
   const startOfYesterday = new Date(startOfToday);
   startOfYesterday.setDate(startOfYesterday.getDate() - 1);
 
-  const startOfWeek = new Date();
-  const currentDay = startOfWeek.getDay();
-  const daysToSub = currentDay === 0 ? 6 : currentDay - 1;
+  const today = visibleItems.filter(
+    (item) => new Date(item.updatedAt) >= startOfToday,
+  );
+  const yesterday = visibleItems.filter((item) => {
+    const updatedAt = new Date(item.updatedAt);
+    return updatedAt >= startOfYesterday && updatedAt < startOfToday;
+  });
+  const earlier = visibleItems.filter(
+    (item) => new Date(item.updatedAt) < startOfYesterday,
+  );
 
-  startOfWeek.setDate(startOfWeek.getDate() - daysToSub);
-  startOfWeek.setHours(0, 0, 0, 0);
-
-  const today = [];
-  const yesterday = [];
-  const beforeYesterday = [];
-
-  function sortGroups(doc) {
-    const updatedAt = new Date(doc.updatedAt);
-
-    if (updatedAt >= startOfToday) {
-      today.push(doc);
-    } else if (updatedAt >= startOfYesterday) {
-      yesterday.push(doc);
+  function handleSelect(item) {
+    if (item.type === "Folder") {
+      handleSelectFolder(item, item.id);
+      setMode("folder");
     } else {
-      beforeYesterday.push(doc);
+      handleSelectDocument(item);
+      setMode("view");
+    }
+
+    setEditable(false);
+  }
+
+  function handleEdit(item) {
+    handleSelectDocument(item);
+    setMode("write");
+    setEditable(true);
+  }
+
+  function handleDelete(item) {
+    const deletedAt = new Date().toISOString();
+
+    if (item.type === "Folder") {
+      deleteFolder(item.id, deletedAt);
+    } else {
+      deleteDocument(item.id, deletedAt);
     }
   }
 
-  for (const doc of items) {
-    sortGroups(doc);
+  function toggleStar(item) {
+    const updates = { starred: !item.starred };
+
+    if (item.type === "Folder") {
+      editFolder(item.id, updates);
+    } else {
+      editDocument(item.id, updates);
+    }
   }
 
-  const renderGroup = (group) =>
-    group.map((item, i) => {
-      const updated = new Date(item.updatedAt).getTime();
-      const folder = foldersData.find((fol) => fol.id === item.folderId);
-      const difference = now - updated;
-
-      const minutes = Math.floor(difference / (1000 * 60));
-      const hours = Math.floor(difference / (1000 * 60 * 60));
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+  function renderGroup(group) {
+    return group.map((item) => {
+      const folder = foldersData.find((entry) => entry.id === item.folderId);
+      const folderDocs =
+        mode === "folder" && selectedFolder?.id === item.id
+          ? visibleItems.filter(
+              (doc) => doc.type === "Document" && doc.folderId === item.id,
+            )
+          : [];
 
       return (
-        <div
+        <DocumentRow
           key={item.id}
-          className={`rounded relative ${mode === "folder" ? "grid-cols-1 grid gap-y-2" : ""}`}
-          onClick={() => {
-            item.type === "Folder"
-              ? handleSelectFolder(item, item.id)
-              : handleSelectDocument(item);
-
-            setEditable(false);
-
-            {
-              item.type === "Document"
-                ? setMode("view")
-                : item.type === "Folder"
-                  ? setMode("folder")
-                  : "";
-            }
-            // console.log(mode)
-          }}
+          item={item}
+          folder={folder}
+          mode={mode}
+          selectedFolder={selectedFolder}
+          popup={popup}
+          setPopup={setPopup}
+          onSelect={handleSelect}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onToggleStar={toggleStar}
         >
-          {deleteId === item.id && (
-            <div
-              className="fixed z-[1000] bg-white top-60 left-135 text-center border-muted/40 border rounded px-6 py-12"
-              onClick={(e) => {
-                e.stopPropagation();
+          {folderDocs.map((doc) => (
+            <DocumentRow
+              key={doc.id}
+              item={doc}
+              mode={mode}
+              selectedFolder={selectedFolder}
+              popup={popup}
+              setPopup={setPopup}
+              onSelect={(selected) => {
+                handleSelectDocument(selected);
                 setMode("view");
+                setEditable(false);
               }}
-            >
-              <h3 className="font-semibold text-lg">Confirm Deletion!</h3>
-              <p>Are you sure you want to delete `{item.title}`?</p>
-
-              <div className="mt-4 flex items-center gap-x-2 justify-center">
-                <button
-                  onClick={(event) => {
-                    setDeleteId(null);
-                    event.stopPropagation();
-                  }}
-                  className="text-red-500 border border-red-500 px-6 py-2 cursor-pointer rounded"
-                >
-                  Don&apos;t delete
-                </button>
-
-                <button
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    handleDelete(item.id);
-                    setDeleteId(null);
-                  }}
-                  className="bg-red-500 text-white px-6 py-2 rounded cursor-pointer"
-                >
-                  Yes, Delete
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div className="flex p-2 space-x-3 md:space-x-4 hover:bg-muted/20">
-            <div
-              className={`flex ${getTypeStyle(item.type)} items-center justify-center md:px-3 md:py-1 px-3 rounded`}
-            >
-              {item.type === "Document" ? (
-                <FileText className="h-6 w-6" />
-              ) : item.type == "Folder" && mode !== "folder" ? (
-                <Folder className="h-6 w-6" />
-              ) : mode === "folder" &&
-                item.type === "Folder" &&
-                item.id === selectedFolder?.id ? (
-                <ChevronDown className="h-6 w-6" />
-              ) : (
-                <Folder className="h-6 w-6" />
-              )}
-            </div>
-
-            <div className="flex flex-col w-full gap-y-0">
-              <h3 className="font-heading max-md:text-sm font-semibold">
-                {item.title}
-              </h3>
-
-              <div className="flex items-center justify-between w-full text-sm text-muted">
-                <div className="flex items-center gap-x-0">
-                  <p key={i} className="hidden md:block">
-                    {folder ? (
-                      <span>{folder.title}</span>
-                    ) : (
-                      <span>{item.type}</span>
-                    )}
-                  </p>
-
-                  <span>
-                    <Dot className="hidden md:block" />
-                  </span>
-
-                  {days >= 1 ? (
-                    <p className="max-md:text-xs">Updated {days} day(s) ago</p>
-                  ) : hours >= 1 ? (
-                    <p className="max-md:text-xs">
-                      Updated {hours} hour(s) ago
-                    </p>
-                  ) : minutes >= 1 ? (
-                    <p className="max-md:text-xs">
-                      Updated {minutes} minute(s) ago
-                    </p>
-                  ) : (
-                    <p className="max-md:text-xs">Updated just now</p>
-                  )}
-                </div>
-
-                <div className="flex">
-                  <button
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      toggleStar(item.id);
-                    }}
-                    className="mb-1"
-                  >
-                    <Star
-                      fill={item.starred ? "yellow" : "none"}
-                      size={20}
-                      strokeOpacity={0.4}
-                    />
-                  </button>
-
-                  <div className="relative" data-popup-wrapper>
-                    <button
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setPopup(popup == item.id ? null : item.id);
-                      }}
-                    >
-                      <MoreVertical />
-                    </button>
-
-                    {popup == item.id ? (
-                      <div className="bg-white border border-muted/40 w-35 rounded-lg absolute right-0 z-50 p-2 cursor-pointer">
-                        <button
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setMode("write");
-                            setPopup(null);
-                            handleSelectDocument(item);
-                            setEditable(true);
-                          }}
-                          className="flex items-center gap-x-2 text-foreground w-full px-2 py-3 hover:bg-muted/20 rounded"
-                        >
-                          <Pencil size={18} />
-                          <span>Edit</span>
-                        </button>
-
-                        <button
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setDeleteId(item.id);
-                            setPopup(null);
-                          }}
-                          className="flex items-center gap-x-2 px-2 py-3 w-full text-red-500 hover:bg-red-500/20 rounded"
-                        >
-                          <Trash size={18} />
-                          <span>Delete</span>
-                        </button>
-                      </div>
-                    ) : (
-                      ""
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div></div>
-          </div>
-
-          {mode === "folder" && item.id === selectedFolder?.id ? (
-            <div>
-              {folDocs.map((folDoc, ij) => {
-                const folDocUpdated = new Date(folDoc.updatedAt).getTime();
-                const folDocDifference = now - folDocUpdated;
-
-                const folDocMinutes = Math.floor(
-                  folDocDifference / (1000 * 60),
-                );
-                const folDocHours = Math.floor(
-                  folDocDifference / (1000 * 60 * 60),
-                );
-                const folDocDays = Math.floor(
-                  folDocDifference / (1000 * 60 * 60 * 24),
-                );
-
-                return (
-                  <div
-                    key={ij}
-                    className={`hover:bg-muted/20 flex p-2 space-x-3 md:space-x-4 pr-6 ${mode === "folder" ? " ml-6" : ""}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSelectDocument(folDoc);
-                      setMode("view");
-                    }}
-                  >
-                    <div
-                      className={`flex ${getTypeStyle(folDoc.type)} items-center justify-center md:px-3 md:py-1 px-3 rounded`}
-                    >
-                      <FileText className="h-6 w-6" />
-                    </div>
-
-                    <div className="flex flex-col w-full gap-y-0">
-                      <h3 className="font-heading max-md:text-sm font-semibold">
-                        {folDoc.title}
-                      </h3>
-
-                      <div className="flex items-center justify-between text-sm text-muted">
-                        <div className="flex items-center gap-x-0">
-                          <p className="hidden md:block">{folDoc.type}</p>
-                          <span>
-                            <Dot className="hidden md:block" />
-                          </span>
-
-                          {folDocDays >= 1 ? (
-                            <p className="max-md:text-xs">
-                              Updated {folDocDays} day(s) ago
-                            </p>
-                          ) : folDocHours >= 1 ? (
-                            <p className="max-md:text-xs">
-                              Updated {folDocHours} hour(s) ago
-                            </p>
-                          ) : folDocMinutes >= 1 ? (
-                            <p className="max-md:text-xs">
-                              Updated {folDocMinutes} minute(s) ago
-                            </p>
-                          ) : (
-                            <p className="max-md:text-xs">Updated just now</p>
-                          )}
-                        </div>
-
-                        <div className="flex">
-                          <button
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              toggleStar(folDoc.id);
-                            }}
-                            className="mb-1"
-                          >
-                            <Star
-                              fill={folDoc.starred ? "yellow" : "none"}
-                              size={20}
-                              strokeOpacity={0.4}
-                            />
-                          </button>
-
-                          <div className="relative" data-popup-wrapper>
-                            <button
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                setPopup(popup == folDoc.id ? null : folDoc.id);
-                              }}
-                            >
-                              <MoreVertical />
-                            </button>
-
-                            {popup == folDoc.id ? (
-                              <div className="bg-white border border-muted/40 w-35 rounded-lg absolute right-0 z-50 p-2 cursor-pointer">
-                                <button
-                                  onClick={(event) => {
-                                    event.stopPropagation();
-                                    setMode("write");
-                                    setPopup(null);
-                                    handleSelectDocument(folDoc);
-                                    setEditable(true);
-                                  }}
-                                  className="flex items-center gap-x-2 text-foreground w-full px-2 py-3 hover:bg-muted/20 rounded"
-                                >
-                                  <Pencil size={18} />
-                                  <span>Edit</span>
-                                </button>
-
-                                <button
-                                  onClick={(event) => {
-                                    event.stopPropagation();
-                                    setDeleteId(folDoc.id);
-                                    setPopup(null);
-                                  }}
-                                  className="flex items-center gap-x-2 px-2 py-3 w-full text-red-500 hover:bg-red-500/20 rounded"
-                                >
-                                  <Trash size={18} />
-                                  <span>Delete</span>
-                                </button>
-                              </div>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            ""
-          )}
-        </div>
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onToggleStar={toggleStar}
+            />
+          ))}
+        </DocumentRow>
       );
     });
+  }
 
   return (
     <section className="space-y-4 pt-4">
-      {deleteId !== null && (
-        <div className="fixed inset-0 min-h-screen z-[1000] bg-black/20" />
-      )}
-
-      {today.length > 0 ? (
+      {today.length > 0 && (
         <div>
           <h3 className="font-heading font-semibold text-lg mb-2">Today</h3>
           {renderGroup(today)}
         </div>
-      ) : (
-        ""
       )}
 
-      {yesterday.length > 0 ? (
+      {yesterday.length > 0 && (
         <div>
           <h3 className="font-heading font-semibold text-lg mb-2">Yesterday</h3>
           {renderGroup(yesterday)}
         </div>
-      ) : (
-        ""
       )}
-      {beforeYesterday.length > 0 ? (
+
+      {earlier.length > 0 && (
         <div>
           <h3 className="font-heading font-semibold text-lg mb-2">
             Earlier this week
           </h3>
-          {renderGroup(beforeYesterday)}
+          {renderGroup(earlier)}
         </div>
-      ) : (
-        ""
       )}
     </section>
   );
