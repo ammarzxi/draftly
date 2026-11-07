@@ -51,13 +51,18 @@ export default function Editor({
             <input
               className="border-none focus:outline-none font-heading text-base font-bold w-90"
               onChange={(e) => {
+                const newTitle = e.target.value;
+
                 setSelectedDocument((prev) => ({
                   ...prev,
-                  title: e.target.value,
+                  title: newTitle,
                 }));
+
                 setItems((prevItems) =>
                   prevItems.map((item) =>
-                    item.id === selectedDocument.id ? selectedDocument : item,
+                    item.id === selectedDocument.id
+                      ? { ...item, title: newTitle }
+                      : item,
                   ),
                 );
               }}
