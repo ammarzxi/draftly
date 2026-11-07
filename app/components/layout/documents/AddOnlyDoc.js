@@ -1,19 +1,33 @@
+"use client";
+
 import { useState } from "react";
-import { useGlobal } from "../reuseComponents/GlobalVars";
+import { useGlobal } from "../../../context/GlobalVars";
 
 export default function AddOnlyDoc({
-  handleAddition,
   setNewDoc,
   currentFolder,
 }) {
-  const { items, setItems } = useGlobal();
+  const { createDocument } = useGlobal();
   const [title, setTitle] = useState("");
+
   return (
     <section className="absolute inset-0 z-[1000] bg-black/20 flex items-center justify-center">
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          handleAddition(title);
+
+          const newItem = {
+            id: crypto.randomUUID(),
+            title: title,
+            type: "Document",
+            folderId: currentFolder?.id || null,
+            deletedAt: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+
+          createDocument(newItem);
+          setNewDoc(false);
         }}
       >
         <div className="bg-white border-muted/40 border rounded px-6 py-8 w-96">

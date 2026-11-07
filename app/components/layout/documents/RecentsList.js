@@ -11,7 +11,7 @@ import {
   Trash,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useGlobal } from "../reuseComponents/GlobalVars";
+import { useGlobal } from "@/app/context/GlobalVars";
 
 const getTypeStyle = (type) => {
   const styles = {
@@ -44,20 +44,21 @@ export default function RecentsList({
 }) {
   const [deleteId, setDeleteId] = useState(null);
 
-  const handleClick = (event) => {
-    if (!event.target.closest("[data-popup-wrapper]")) {
-      setPopup(null);
-    }
-  };
   const { mode, setMode, items, setItems } = useGlobal();
 
   useEffect(() => {
+    const handleClick = (event) => {
+      if (!event.target.closest("[data-popup-wrapper]")) {
+        setPopup(null);
+      }
+    };
+
     document.addEventListener("click", handleClick);
 
     return () => {
       document.removeEventListener("click", handleClick);
     };
-  }, []);
+  }, [setPopup]);
 
   const foldersData = items.filter((item) => item.type === "Folder");
 
@@ -156,7 +157,7 @@ export default function RecentsList({
                   }}
                   className="text-red-500 border border-red-500 px-6 py-2 cursor-pointer rounded"
                 >
-                  Don't delete
+                  Don&apos;t delete
                 </button>
 
                 <button

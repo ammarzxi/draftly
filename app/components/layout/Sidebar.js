@@ -46,6 +46,8 @@ const folderLinks = [
 ];
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="max-w-45 px-2 hidden bg-muted/10 lg:block flex-1 pl-3">
       <div className="flex items-center gap-x-2 py-6">
@@ -56,8 +58,8 @@ export default function Sidebar() {
       <nav className="space-y-3">
         {links.map((link, i) => {
           const Icon = link.icon;
-          const pathname = usePathname();
           const isActive = pathname === link.href;
+
           return (
             <div
               key={i}
@@ -75,11 +77,12 @@ export default function Sidebar() {
           <span className="text-sm text-muted">Folders</span>
           <Plus className="text-muted" size={15} />
         </div>
+
         {folderLinks.map((link, i) => {
           const Icon = link.icon;
           // Do something abt isActive in this making hte bg of prject folder gray or blue
-          const pathname = usePathname();
           const isActive = pathname === link.href;
+
           return (
             <div
               key={i}

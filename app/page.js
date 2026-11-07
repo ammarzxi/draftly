@@ -1,13 +1,13 @@
 "use client";
 // What does use client erall mean
 // integrate lazy loading and optimztion and other imprtant stuff and auth and security
-import { useGlobal } from "./reuseComponents/GlobalVars";
+import { useGlobal } from "./context/GlobalVars";
 import { useState } from "react";
-import Editor from "./home/Editor";
-import Header from "./home/Header";
-import Intro from "./home/Intro";
+import Editor from "./components/layout/documents/Editor";
+import Header from "@/app/components/layout/Header"
+import Intro from "@/app/components/home/Intro";
 import documentsData from "@/app/data/documents";
-import List from "./home/List";
+import List from "./components/layout/documents/List";
 
 export default function App() {
   const [selectedDocument, setSelectedDocument] = useState(null);

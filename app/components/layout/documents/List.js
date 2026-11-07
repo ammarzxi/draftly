@@ -13,7 +13,7 @@ import {
   Trash,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useGlobal } from "../reuseComponents/GlobalVars";
+import { useGlobal } from "../../../context/GlobalVars";
 import AddOnlyDoc from "./AddOnlyDoc";
 
 const buttons = [
@@ -85,18 +85,20 @@ export default function List({
         });
   const visibleItems = filteredItems.filter((item) => item.deletedAt === null);
   const foldersData = items.filter((item) => item.type === "Folder");
-  const handleClick = (event) => {
-    if (!event.target.closest("[data-popup-wrapper]")) {
-      setPopup(null);
-    }
-  };
+
   useEffect(() => {
+    const handleClick = (event) => {
+      if (!event.target.closest("[data-popup-wrapper]")) {
+        setPopup(null);
+      }
+    };
+
     document.addEventListener("click", handleClick);
 
     return () => {
       document.removeEventListener("click", handleClick);
     };
-  }, []);
+  }, [setPopup]);
 
   const handleDelete = (id) => {
     setItems((prevItems) => prevItems.filter((item) => item.id !== id));
@@ -116,20 +118,6 @@ export default function List({
   const handleDocumentAdding = (item) => {
     setActiveFolder(item);
     setNewDoc(true);
-  };
-  const handleAddition = (title) => {
-    const newItem = {
-      id: crypto.randomUUID(),
-      title: title,
-      type: "Document",
-      folderId: activeFolder?.id || null,
-      deletedAt: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    setItems((curItems) => [...curItems, newItem]);
-    setNewDoc(false);
   };
 
   const amount = filteredItems.length;
@@ -216,7 +204,7 @@ export default function List({
                       }}
                       className="text-red-500 border border-red-500 px-6 py-2 cursor-pointer rounded"
                     >
-                      Don't delete
+                      Don&apos;t delete
                     </button>
                     <button
                       onClick={(event) => {
@@ -499,7 +487,6 @@ export default function List({
         <AddOnlyDoc
           currentFolder={activeFolder}
           setNewDoc={setNewDoc}
-          handleAddition={handleAddition}
         />
       )}
     </section>

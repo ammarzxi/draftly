@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import Intro from "./Intro";
-import RecentsList from "./RecentsList";
-import Header from "/app/home/Header";
+import Intro from "../components/recents/Intro";
+import RecentsList from "../components/layout/documents/RecentsList";
+import Header from "@/app/components/layout/Header"
+
 
 import documentsData from "@/app/data/documents";
-import { useGlobal } from "../reuseComponents/GlobalVars";
-import Editor from "../home/Editor";
+import { useGlobal } from "../context/GlobalVars";
+import Editor from "../components/layout/documents/Editor";
 
 export default function Recent() {
   const [items, setItems] = useState(documentsData);

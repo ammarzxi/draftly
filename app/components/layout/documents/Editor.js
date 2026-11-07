@@ -1,6 +1,6 @@
 "use client";
 
-import { useGlobal } from "../reuseComponents/GlobalVars";
+import { useGlobal } from "../../../context/GlobalVars";
 import Markdown from "react-markdown";
 import TextArea from "./TextArea";
 import { useEffect, useState } from "react";
@@ -106,7 +106,7 @@ export default function Editor({
             ) : (
               <p className="flex items-center gap-x-1">
                 {" "}
-                <AlertCircle className="text-red-600" size={20} /> Couldn't save
+                <AlertCircle className="text-red-600" size={20} /> Couldn&apos;t save
               </p>
             )}
             {/*Show error as to why   */}

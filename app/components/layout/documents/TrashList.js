@@ -2,7 +2,7 @@
 
 import { FileText, Folder, Dot, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { useGlobal } from "../reuseComponents/GlobalVars";
+import { useGlobal } from "../../../context/GlobalVars";
 
 const getTypeStyle = (type) => {
   const styles = {
@@ -83,7 +83,7 @@ export default function TrashList() {
                       }}
                       className="text-red-500 border border-red-500 px-6 py-2 cursor-pointer rounded"
                     >
-                      Don't restore
+                      Don&apos;t restore
                     </button>
                     <button
                       onClick={(event) => {
@@ -120,7 +120,7 @@ export default function TrashList() {
                       }}
                       className="text-red-500 border border-red-500 px-6 py-2 cursor-pointer rounded"
                     >
-                      Don't delete
+                      Don&apos;t delete
                     </button>
                     <button
                       onClick={(event) => {

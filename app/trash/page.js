@@ -1,9 +1,9 @@
 "use client";
 
 import documentsData from "../data/documents";
-import Header from "@/app/home/Header";
-import Intro from "./Intro";
-import TrashList from "./TrashList";
+import Header from "@/app/components/layout/Header";
+import Intro from "../components/trash/Intro";
+import TrashList from "../components/layout/documents/TrashList";
 import { useState } from "react";
 
 export default function Trash() {

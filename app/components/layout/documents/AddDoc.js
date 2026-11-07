@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGlobal } from "../reuseComponents/GlobalVars";
+import { useGlobal } from "../../../context/GlobalVars";
 
 export default function AddDoc() {
   const { items, handleAddition, setConfirm, itemType, setItemType } =
