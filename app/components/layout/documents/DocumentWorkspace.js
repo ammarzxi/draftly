@@ -57,9 +57,8 @@ export default function DocumentWorkspace({ variant }) {
         <div className="py-4">
           <Intro />
           <DocumentList
-            selectedDocument={selectedDocument}
             selectedFolder={selectedFolder}
-            folDocs={folDocs}
+            folDocs={variant === "recent" ? folDocs : undefined}
             setPopup={setPopup}
             popup={popup}
             setSelectedFolder={variant === "home" ? setSelectedFolder : undefined}
