@@ -71,15 +71,12 @@ export default function DocumentWorkspace({ variant }) {
           />
         </div>
         <Editor
-          popup={popup}
-          setPopup={setPopup}
           editable={editable}
           setEditable={setEditable}
           selectedDocument={selectedDocument}
           setSelectedDocument={setSelectedDocument}
           input={input}
           setInput={handleContentChange}
-          items={items}
           setItems={setItems}
         />
       </div>
