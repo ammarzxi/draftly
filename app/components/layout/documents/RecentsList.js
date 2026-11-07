@@ -18,18 +18,13 @@ import { getTypeStyle } from "../../../utils/documents";
 const now = Date.now();
 
 export default function RecentsList({
-  data,
-  selectedDocument,
-  setSelectedDocument,
   handleSelectFolder,
   handleSelectDocument,
   popup,
-  setSelectedFolder,
   setPopup,
   folDocs,
   selectedFolder,
   setEditable,
-  editable,
 }) {
   const [deleteId, setDeleteId] = useState(null);
 
