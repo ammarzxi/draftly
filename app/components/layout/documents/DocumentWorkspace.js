@@ -10,7 +10,7 @@ import RecentsIntro from "../../recents/Intro";
 import Header from "../Header";
 
 export default function DocumentWorkspace({ variant }) {
-  const { items, editDocument } = useGlobal();
+  const { editDocument, editFolder } = useGlobal();
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [input, setInput] = useState("");
@@ -33,7 +33,7 @@ export default function DocumentWorkspace({ variant }) {
   function handleContentChange(content) {
     setInput(content);
 
-    if (selectedDocument) {
+    if (selectedDocument?.type === "Document") {
       editDocument(selectedDocument.id, {
         content,
         updatedAt: new Date().toISOString(),
@@ -44,7 +44,12 @@ export default function DocumentWorkspace({ variant }) {
   function handleTitleChange(title) {
     setSelectedDocument((prev) => prev ? { ...prev, title } : prev);
 
-    if (selectedDocument) {
+    if (selectedDocument?.type === "Folder") {
+      editFolder(selectedDocument.id, {
+        title,
+        updatedAt: new Date().toISOString(),
+      });
+    } else if (selectedDocument) {
       editDocument(selectedDocument.id, {
         title,
         updatedAt: new Date().toISOString(),
