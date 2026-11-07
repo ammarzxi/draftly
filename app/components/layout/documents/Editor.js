@@ -3,43 +3,33 @@
 import { useGlobal } from "../../../context/GlobalVars";
 import Markdown from "react-markdown";
 import TextArea from "./TextArea";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import remarkGfm from "remark-gfm";
 import {
   AlertCircle,
   Check,
-  Cross,
   Eye,
-  FileWarning,
   MoreHorizontal,
   Pencil,
-  PlayCircle,
   PlayIcon,
   Save,
   SquarePen,
-  SquarePenIcon,
   X,
 } from "lucide-react";
-import { Play } from "next/font/google";
 
 export default function Editor({
   selectedDocument,
   setSelectedDocument,
   input,
   setInput,
-  setPopup,
-  popup,
-  items,
   setItems,
   editable,
   setEditable,
 }) {
-  const [showLines, setShowLines] = useState(true);
   const { mode, setMode } = useGlobal();
   const [cursorLine, setCursorLine] = useState(1);
   const [cursorColumn, setCursorColumn] = useState(1);
   const [saved, SetSave] = useState(false);
-  const wordCount = input.trim() ? input.trim().split(/\s+/).length : 0;
 
   return (
     <section
@@ -127,9 +117,7 @@ export default function Editor({
                 ))}
             </div> */}
         <TextArea
-          setMode={setMode}
           editable={editable}
-          setEditable={setEditable}
           input={input}
           setInput={setInput}
           cursorLine={cursorLine}
