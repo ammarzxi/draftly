@@ -70,9 +70,6 @@ export default function MarkdownEditor({
   input,
   editable,
   setInput,
-  cursorLine,
-  setCursorLine,
-  setCursorColumn,
 }) {
   return (
     <div className="overflow-hidden border border-border pt-4 w-full">
@@ -91,13 +88,6 @@ export default function MarkdownEditor({
           highlightActiveLine: true,
         }}
         editable={editable}
-        onUpdate={(viewUpdate) => {
-          const head = viewUpdate.state.selection.main.head;
-          const line = viewUpdate.state.doc.lineAt(head);
-
-          setCursorLine(line.number);
-          setCursorColumn(head - line.from + 1);
-        }}
       />
     </div>
   );
