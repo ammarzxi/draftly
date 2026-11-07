@@ -10,41 +10,46 @@ import RecentsIntro from "../../recents/Intro";
 import Header from "../Header";
 
 export default function DocumentWorkspace({ variant }) {
-  const { items, setItems } = useGlobal();
+  const { items, editDocument } = useGlobal();
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [input, setInput] = useState("");
   const [popup, setPopup] = useState(null);
   const [editable, setEditable] = useState(false);
 
-  const folDocs = items.filter(
-    (item) =>
-      item.type === "Document" &&
-      item.folderId !== null &&
-      item.folderId === selectedFolder?.id,
-  );
-
   function handleSelectDocument(doc) {
     setSelectedDocument(doc);
     setInput(doc.content ?? "");
   }
 
-  function handleSelectFolder(fol, id) {
+  function handleSelectFolder(folder, id) {
     if (selectedFolder?.id === id) {
       setSelectedFolder(null);
     } else {
-      setSelectedFolder(fol);
+      setSelectedFolder(folder);
     }
   }
 
-  function handleContentChange(newContent) {
-    setInput(newContent);
+  function handleContentChange(content) {
+    setInput(content);
 
-    setItems((prevItems) =>
-      prevItems.map((doc) =>
-        doc.id === selectedDocument?.id ? { ...doc, content: newContent } : doc,
-      ),
-    );
+    if (selectedDocument) {
+      editDocument(selectedDocument.id, {
+        content,
+        updatedAt: new Date().toISOString(),
+      });
+    }
+  }
+
+  function handleTitleChange(title) {
+    setSelectedDocument((prev) => prev ? { ...prev, title } : prev);
+
+    if (selectedDocument) {
+      editDocument(selectedDocument.id, {
+        title,
+        updatedAt: new Date().toISOString(),
+      });
+    }
   }
 
   const Intro = variant === "recent" ? RecentsIntro : HomeIntro;
@@ -58,10 +63,9 @@ export default function DocumentWorkspace({ variant }) {
           <Intro />
           <DocumentList
             selectedFolder={selectedFolder}
-            folDocs={variant === "recent" ? folDocs : undefined}
             setPopup={setPopup}
             popup={popup}
-            setSelectedFolder={variant === "home" ? setSelectedFolder : undefined}
+            setSelectedFolder={setSelectedFolder}
             setEditable={setEditable}
             handleSelectDocument={handleSelectDocument}
             handleSelectFolder={handleSelectFolder}
@@ -71,10 +75,9 @@ export default function DocumentWorkspace({ variant }) {
           editable={editable}
           setEditable={setEditable}
           selectedDocument={selectedDocument}
-          setSelectedDocument={setSelectedDocument}
           input={input}
-          setInput={handleContentChange}
-          setItems={setItems}
+          onInputChange={handleContentChange}
+          onTitleChange={handleTitleChange}
         />
       </div>
     </main>

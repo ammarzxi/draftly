@@ -31,7 +31,13 @@ export default function DocumentRow({
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
-    <div className="rounded relative" onClick={() => onSelect(item)}>
+    <div
+      className="rounded relative"
+      onClick={(event) => {
+        event.stopPropagation();
+        onSelect(item);
+      }}
+    >
       {confirmDelete && (
         <div
           className="fixed inset-0 z-[1000] bg-black/20 flex items-center justify-center"
