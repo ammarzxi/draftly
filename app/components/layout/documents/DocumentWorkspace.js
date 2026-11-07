@@ -62,6 +62,7 @@ export default function DocumentWorkspace({ variant }) {
             folDocs={folDocs}
             setPopup={setPopup}
             popup={popup}
+            setSelectedFolder={variant === "home" ? setSelectedFolder : undefined}
             setEditable={setEditable}
             handleSelectDocument={handleSelectDocument}
             handleSelectFolder={handleSelectFolder}
