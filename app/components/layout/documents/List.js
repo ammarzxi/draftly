@@ -3,7 +3,6 @@
 import {
   ChevronDown,
   Dot,
-  File,
   FileText,
   Folder,
   MoreVertical,
@@ -43,16 +42,11 @@ export default function List({
   selectedFolder,
   setEditable,
 }) {
-  const [selectedId, setSelectedId] = useState(null);
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-  });
   const [deleteId, setDeleteId] = useState(null);
   const [newDoc, setNewDoc] = useState(false);
   const [activeFolder, setActiveFolder] = useState(false);
   const [tab, setTab] = useState("All");
-  const { mode, setMode, items, setItems, setConfirm, confirm } = useGlobal();
+  const { mode, setMode, items, setItems } = useGlobal();
 
 
   const sortedItems = [...items].sort(
@@ -88,10 +82,6 @@ export default function List({
       document.removeEventListener("click", handleClick);
     };
   }, [setPopup]);
-
-  const handleDelete = (id) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  };
 
   const handleDeleteId = (id) => {
     const currentDate = new Date().toISOString();
@@ -165,7 +155,6 @@ export default function List({
                 item.type === "Folder"
                   ? handleSelectFolder(item, item.id)
                   : handleSelectDocument(item);
-                setSelectedId(item.id);
                 setEditable(false);
                 {
                   item.type === "Document"
