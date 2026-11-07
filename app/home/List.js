@@ -8,10 +8,13 @@ import {
   Folder,
   MoreVertical,
   Pencil,
+  Plus,
   Star,
   Trash,
 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useGlobal } from "../reuseComponents/GlobalVars";
+import AddOnlyDoc from "./AddOnlyDoc";
 
 const buttons = [
   {
@@ -31,27 +34,24 @@ const buttons = [
 const now = Date.now();
 
 export default function List({
-  selectedDocument,
-  setItems,
-  items,
-  mode,
-  setSelectedDocument,
-  setMode,
   handleSelectFolder,
   handleSelectDocument,
   popup,
+  setSelectedFolder,
   setPopup,
-  folDocs,
   selectedFolder,
   setEditable,
-  editable,
 }) {
   const [selectedId, setSelectedId] = useState(null);
-
-  const documents = items.find((item) => item.id === selectedId);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+  });
   const [deleteId, setDeleteId] = useState(null);
+  const [newDoc, setNewDoc] = useState(false);
   const [activeFolder, setActiveFolder] = useState(false);
   const [tab, setTab] = useState("All");
+  const { mode, setMode, items, setItems, setConfirm, confirm } = useGlobal();
 
   const getTypeStyle = (type) => {
     const styles = {
@@ -70,14 +70,21 @@ export default function List({
     (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
   );
 
-  const filteredItems = (tab === "Recent" ? sortedItems : items).filter(
-    (item) => {
-      if (tab === "Starred") return item.starred;
-      if (tab === "Folders") return item.type == "Folder";
-      return true;
-    },
-  );
-
+  const filteredItems =
+    tab === "Recent"
+      ? sortedItems
+      : items.filter((item) => {
+          if (tab === "Folders") return item.type == "Folder";
+          if (tab === "Starred")
+            return item.type == "Document" && item.starred == true;
+          if (tab === "All")
+            return (
+              item.type === "Folder" ||
+              (item.type === "Document" && item.folderId == null)
+            );
+        });
+  const visibleItems = filteredItems.filter((item) => item.deletedAt === null);
+  const foldersData = items.filter((item) => item.type === "Folder");
   const handleClick = (event) => {
     if (!event.target.closest("[data-popup-wrapper]")) {
       setPopup(null);
@@ -95,8 +102,38 @@ export default function List({
     setItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
-  const amount = filteredItems.length;
+  const handleDeleteId = (id) => {
+    const currentDate = new Date().toISOString();
 
+    setItems((prev) => {
+      console.log(prev);
+      return prev.map((item) =>
+        item.id == id ? { ...item, deletedAt: currentDate } : item,
+      );
+    });
+  };
+
+  const handleDocumentAdding = (item) => {
+    setActiveFolder(item);
+    setNewDoc(true);
+  };
+  const handleAddition = (title) => {
+    const newItem = {
+      id: crypto.randomUUID(),
+      title: title,
+      type: "Document",
+      folderId: activeFolder?.id || null,
+      deletedAt: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    setItems((curItems) => [...curItems, newItem]);
+    setNewDoc(false);
+  };
+
+  const amount = filteredItems.length;
+  // console.log(newDoc);
   return (
     <section className="space-y-4 pt-4">
       <div className="flex items-center gap-x-6 border-b border-muted/20">
@@ -105,10 +142,13 @@ export default function List({
             <button
               key={i}
               className={`pb-4 ${tab == button.title ? "underline decoration-primary decoration-4 text-primary/80" : "transition-colors duration-300 ease-in-out"}`}
+              onClick={() => setSelectedFolder(null)}
             >
               <span
                 className="cursor-pointer"
-                onClick={() => setTab(button.title)}
+                onClick={() => {
+                  setTab(button.title);
+                }}
               >
                 {button.title}
               </span>
@@ -122,7 +162,8 @@ export default function List({
         <div className="fixed inset-0 min-h-screen z-[1000] bg-black/20" />
       )}
       <div className="space-y-4">
-        {filteredItems.map((item, i) => {
+        {visibleItems.map((item, i) => {
+          const folder = foldersData.find((fol) => fol.id === item.folderId);
           const updated = new Date(item.updatedAt).getTime();
           const difference = now - updated;
 
@@ -161,15 +202,17 @@ export default function List({
               {deleteId === item.id && (
                 <div
                   className="fixed z-[1000] bg-white top-60 left-135 text-center border-muted/40 border rounded px-6 py-12"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
                 >
                   <h3 className="font-semibold text-lg">Confirm Deletion!</h3>
                   <p>Are you sure you want to delete `{item.title}`?</p>
                   <div className="mt-4 flex items-center gap-x-2 justify-center">
                     <button
                       onClick={(event) => {
-                        setDeleteId(null);
                         event.stopPropagation();
+                        setDeleteId(null);
                       }}
                       className="text-red-500 border border-red-500 px-6 py-2 cursor-pointer rounded"
                     >
@@ -178,8 +221,9 @@ export default function List({
                     <button
                       onClick={(event) => {
                         event.stopPropagation();
-                        handleDelete(item.id);
                         setDeleteId(null);
+                        handleDeleteId(item.id);
+                        // console.log(item)
                       }}
                       className="bg-red-500 text-white px-6 py-2 rounded cursor-pointer"
                     >
@@ -213,7 +257,13 @@ export default function List({
                   </h3>
                   <div className="flex items-center justify-between w-full text-sm text-muted">
                     <div className="flex items-center gap-x-0">
-                      <p className="hidden md:block">{item.type}</p>
+                      <p key={i} className="hidden md:block">
+                        {folder ? (
+                          <span>{folder.title}</span>
+                        ) : (
+                          <span>{item.type}</span>
+                        )}
+                      </p>
                       <span>
                         <Dot className="hidden md:block" />
                       </span>
@@ -272,6 +322,21 @@ export default function List({
                               <Pencil size={18} />
                               <span>Edit</span>
                             </button>
+                            {item.type == "Folder" ? (
+                              <button
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  setPopup(null);
+                                  handleDocumentAdding(item);
+                                }}
+                                className="flex items-center gap-x-2 text-foreground w-full px-2 py-3 hover:bg-muted/20 rounded"
+                              >
+                                <Plus size={18} />
+                                <span>Add Document</span>
+                              </button>
+                            ) : (
+                              ""
+                            )}
                             {/* <hr /> */}
                             <button
                               onClick={(event) => {
@@ -289,6 +354,7 @@ export default function List({
                           ""
                         )}
                       </div>
+
                       {/* Add seperate page for each doc */}
                     </div>
                   </div>
@@ -297,273 +363,123 @@ export default function List({
               </div>
               {mode === "folder" && item.id === selectedFolder?.id ? (
                 <div className={``}>
-                  {folDocs.map((folDoc, ij) => {
-                    return (
-                      <div
-                        key={ij}
-                        className={`hover:bg-muted/20 flex p-2 space-x-3 md:space-x-4 pr-6 ${mode === "folder" ? " ml-6" : ""}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectDocument(folDoc);
-                          setMode("view");
-                        }}
-                      >
+                  {items
+                    .filter(
+                      (doc) =>
+                        doc.type === "Document" &&
+                        doc.folderId === selectedFolder?.id &&
+                        doc.deletedAt === null,
+                    )
+                    .map((folDoc, ij) => {
+                      return (
                         <div
-                          className={`flex ${getTypeStyle(folDoc.type)} items-center justify-center md:px-3 md:py-1 px-3 rounded`}
+                          key={ij}
+                          className={`hover:bg-muted/20 flex p-2 space-x-3 md:space-x-4 pr-6 ${mode === "folder" ? " ml-6" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectDocument(folDoc);
+                            setMode("view");
+                          }}
                         >
-                          <FileText className="h-6 w-6" />
-                        </div>
-                        <div className="flex flex-col w-full gap-y-0">
-                          <h3 className="font-heading max-md:text-sm font-semibold">
-                            {folDoc.title}
-                          </h3>
-                          <div className="flex items-center justify-between text-sm text-muted">
-                            <div className="flex items-center gap-x-0">
-                              <p className="hidden md:block">{folDoc.type}</p>
-                              <span>
-                                <Dot className="hidden md:block" />
-                              </span>
-                              {days >= 1 ? (
-                                <p className="max-md:text-xs">
-                                  Updated {days} day(s) ago
-                                </p>
-                              ) : hours >= 1 ? (
-                                <p className="max-md:text-xs">
-                                  Updated {hours} hour(s) ago
-                                </p>
-                              ) : minutes >= 1 ? (
-                                <p className="max-md:text-xs">
-                                  Updated {minutes} minute(s) ago
-                                </p>
-                              ) : (
-                                <p className="max-md:text-xs">
-                                  Updated just now
-                                </p>
-                              )}
-                            </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                            <div className="flex">
-                              {/* Add selected states to be DARKER */}
-                              <button
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  toggleStar(folDoc.id);
-                                }}
-                                className="mb-1"
-                              >
-                                <Star
-                                  fill={folDoc.starred ? "yellow" : "none"}
-                                  size={20}
-                                  strokeOpacity={0.4}
-                                />
-                              </button>
-                              <div className="relative" data-popup-wrapper>
+                          <div
+                            className={`flex ${getTypeStyle(folDoc.type)} items-center justify-center md:px-3 md:py-1 px-3 rounded`}
+                          >
+                            <FileText className="h-6 w-6" />
+                          </div>
+                          <div className="flex flex-col w-full gap-y-0">
+                            <h3 className="font-heading max-md:text-sm font-semibold">
+                              {folDoc.title}
+                            </h3>
+                            <div className="flex items-center justify-between text-sm text-muted">
+                              <div className="flex items-center gap-x-0">
+                                <p className="hidden md:block">{folDoc.type}</p>
+                                <span>
+                                  <Dot className="hidden md:block" />
+                                </span>
+                                {days >= 1 ? (
+                                  <p className="max-md:text-xs">
+                                    Updated {days} day(s) ago
+                                  </p>
+                                ) : hours >= 1 ? (
+                                  <p className="max-md:text-xs">
+                                    Updated {hours} hour(s) ago
+                                  </p>
+                                ) : minutes >= 1 ? (
+                                  <p className="max-md:text-xs">
+                                    Updated {minutes} minute(s) ago
+                                  </p>
+                                ) : (
+                                  <p className="max-md:text-xs">
+                                    Updated just now
+                                  </p>
+                                )}
+                              </div>
+
+                              <div className="flex">
+                                {/* Add selected states to be DARKER */}
                                 <button
                                   onClick={(event) => {
                                     event.stopPropagation();
-                                    setPopup(
-                                      popup == folDoc.id ? null : folDoc.id,
-                                    );
+                                    toggleStar(folDoc.id);
                                   }}
+                                  className="mb-1"
                                 >
-                                  <MoreVertical />
+                                  <Star
+                                    fill={folDoc.starred ? "yellow" : "none"}
+                                    size={20}
+                                    strokeOpacity={0.4}
+                                  />
                                 </button>
-                                {popup == folDoc.id ? (
-                                  <div className="bg-white border border-muted/40 w-35 rounded-lg absolute right-0 z-50 p-2 cursor-pointer">
-                                    <button
-                                      onClick={(event) => {
-                                        event.stopPropagation();
-                                        setMode("write");
-                                        setPopup(null);
-                                        handleSelectDocument(folDoc);
-                                        setEditable(true);
-                                      }}
-                                      className="flex items-center gap-x-2 text-foreground w-full px-2 py-3 hover:bg-muted/20 rounded"
-                                    >
-                                      <Pencil size={18} />
-                                      <span>Edit</span>
-                                    </button>
-                                    {/* <hr /> */}
-                                    <button
-                                      onClick={(event) => {
-                                        event.stopPropagation();
-                                        setDeleteId(folDoc.id);
-                                        setPopup(null);
-                                      }}
-                                      className="flex items-center gap-x-2 px-2 py-3 w-full text-red-500 hover:bg-red-500/20 rounded"
-                                    >
-                                      <Trash size={18} />
-                                      <span>Delete</span>
-                                    </button>
-                                  </div>
-                                ) : (
-                                  ""
-                                )}
+                                <div className="relative" data-popup-wrapper>
+                                  <button
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      setPopup(
+                                        popup == folDoc.id ? null : folDoc.id,
+                                      );
+                                    }}
+                                  >
+                                    <MoreVertical />
+                                  </button>
+                                  {popup == folDoc.id ? (
+                                    <div className="bg-white border border-muted/40 w-35 rounded-lg absolute right-0 z-50 p-2 cursor-pointer">
+                                      <button
+                                        onClick={(event) => {
+                                          event.stopPropagation();
+                                          setMode("write");
+                                          setPopup(null);
+                                          handleSelectDocument(folDoc);
+                                          setEditable(true);
+                                        }}
+                                        className="flex items-center gap-x-2 text-foreground w-full px-2 py-3 hover:bg-muted/20 rounded"
+                                      >
+                                        <Pencil size={18} />
+                                        <span>Edit</span>
+                                      </button>
+                                      {/* <hr /> */}
+                                      <button
+                                        onClick={(event) => {
+                                          event.stopPropagation();
+                                          setDeleteId(folDoc.id);
+                                          setPopup(null);
+                                        }}
+                                        className="flex items-center gap-x-2 px-2 py-3 w-full text-red-500 hover:bg-red-500/20 rounded"
+                                      >
+                                        <Trash size={18} />
+                                        <span>Delete</span>
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                                {/* Add seperate page for each doc */}
                               </div>
-                              {/* Add seperate page for each doc */}
                             </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </div>
               ) : (
                 ""
@@ -579,7 +495,13 @@ export default function List({
           <p>Empty List! Add some to get started</p>
         )}
       </div>
+      {newDoc && (
+        <AddOnlyDoc
+          currentFolder={activeFolder}
+          setNewDoc={setNewDoc}
+          handleAddition={handleAddition}
+        />
+      )}
     </section>
   );
 }
-

@@ -1,7 +1,8 @@
 import { Inter, Manrope, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/Navbar";
-import Sidebar from "./components/Sidebar";
+import Navbar from "./reuseComponents/Navbar";
+import Sidebar from "./reuseComponents/Sidebar";
+import GlobalProvider from "./reuseComponents/GlobalVars";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -30,7 +31,9 @@ export default function RootLayout({ children }) {
         <div className="flex">
           <Sidebar />
 
-          <main className="min-w-0 flex-1 p-2">{children}</main>
+          <main className="min-w-0 flex-1 p-2">
+            <GlobalProvider>{children}</GlobalProvider>
+          </main>
         </div>
       </body>
     </html>

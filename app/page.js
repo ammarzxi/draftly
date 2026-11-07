@@ -1,17 +1,17 @@
 "use client";
 // What does use client erall mean
 // integrate lazy loading and optimztion and other imprtant stuff and auth and security
+import { useGlobal } from "./reuseComponents/GlobalVars";
 import { useState } from "react";
-import Editor from "./mainComponents/Editor";
-import Header from "./mainComponents/Header";
-import Intro from "./mainComponents/Intro";
+import Editor from "./home/Editor";
+import Header from "./home/Header";
+import Intro from "./home/Intro";
 import documentsData from "@/app/data/documents";
-import List from "./mainComponents/List";
+import List from "./home/List";
 
 export default function App() {
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [selectedFolder, setSelectedFolder] = useState(null);
-  const [mode, setMode] = useState("close");
   const [input, setInput] = useState("");
   const [popup, setPopup] = useState(null);
   const [items, setItems] = useState(documentsData);
@@ -30,13 +30,12 @@ export default function App() {
   }
 
   function handleSelectFolder(fol, id) {
-      if (selectedFolder?.id === id) {
-        setSelectedFolder(null)
-      } else {
-        setSelectedFolder(fol)
-      }
+    if (selectedFolder?.id === id) {
+      setSelectedFolder(null);
+    } else {
+      setSelectedFolder(fol);
+    }
   }
-
 
   function handleContentChange(newContent) {
     setInput(newContent);
@@ -47,6 +46,7 @@ export default function App() {
       ),
     );
   }
+
   // MAKE A POST ON LINKEDIN AND INSTA ABT THIS AND MAKE INSTA VIDOES WITH HIGHLITS OF CATS AND ALSO MANAGE THE FOLDER > dOCUMENTS THING
   return (
     <main className="p-4">
@@ -61,12 +61,11 @@ export default function App() {
             selectedFolder={selectedFolder}
             setItems={setItems}
             setPopup={setPopup}
-            mode={mode}
+            setSelectedFolder={setSelectedFolder}
             popup={popup}
             setSelectedDocument={setSelectedDocument}
             editable={editable}
             setEditable={setEditable}
-            setMode={setMode}
             handleSelectDocument={handleSelectDocument}
             handleSelectFolder={handleSelectFolder}
           />
@@ -81,11 +80,9 @@ export default function App() {
           setSelectedDocument={setSelectedDocument}
           input={input}
           setInput={handleContentChange}
-          mode={mode}
           // Show starred doc and it's respective folders
           // AWS SERVICES
 
-          setMode={setMode}
           items={items}
           setItems={setItems}
         />

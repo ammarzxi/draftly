@@ -1,5 +1,6 @@
 "use client";
 
+import { useGlobal } from "../reuseComponents/GlobalVars";
 import Markdown from "react-markdown";
 import TextArea from "./TextArea";
 import { useEffect, useState } from "react";
@@ -22,8 +23,6 @@ import {
 import { Play } from "next/font/google";
 
 export default function Editor({
-  mode,
-  setMode,
   selectedDocument,
   setSelectedDocument,
   input,
@@ -36,6 +35,7 @@ export default function Editor({
   setEditable,
 }) {
   const [showLines, setShowLines] = useState(true);
+  const { mode, setMode } = useGlobal();
   const [cursorLine, setCursorLine] = useState(1);
   const [cursorColumn, setCursorColumn] = useState(1);
   const [saved, SetSave] = useState(false);
@@ -83,7 +83,7 @@ export default function Editor({
               )}
             </div>
             <MoreHorizontal />
-            {mode ? <X size={20} onClick={() => setMode("close")} /> : ""}
+            {mode ? <X size={20} onClick={() => setMode("folder")} /> : ""}
           </div>
         </div>
         <div className="flex items-center justify-between mt-3">

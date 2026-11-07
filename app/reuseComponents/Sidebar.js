@@ -17,7 +17,7 @@ const links = [
   },
   {
     title: "Recent",
-    href: "/recent",
+    href: "/recents",
     icon: Clock,
   },
   {
@@ -41,11 +41,6 @@ const folderLinks = [
   {
     title: "Ideas",
     href: "/recent",
-    icon: Folder,
-  },
-  {
-    title: "Learning",
-    href: "/trash",
     icon: Folder,
   },
 ];

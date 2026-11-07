@@ -1,8 +1,14 @@
+"use client";
 import { Bell, Plus, Search, Sun } from "lucide-react";
+import { useState } from "react";
+import AddDoc from "./AddDoc";
+
+import { useGlobal } from "../reuseComponents/GlobalVars";
 
 export default function Input() {
+  const { addDocument } = useGlobal();
   return (
-    <section className="bg-muted/20 h-fit py-2 px-2 flex-1 rounded flex justify-between flex-col md:flex-row">
+    <section className="bg-muted/20 h-fit py-2 px-2 flex-1 rounded flex justify-between flex-col md:flex-row col-span-full">
       <div className="bg-white flex items-center space-x-3 py-1 px-2 rounded md:w-70">
         <Search size={15} className="text-muted" />
         <input
@@ -17,6 +23,7 @@ export default function Input() {
 
         <button
           className={`flex items-center text-white bg-primary px-2.5 text-sm py-1.5 rounded gap-x-2`}
+          onClick={() => addDocument()}
         >
           <Plus size={20} />
           <span className="font-sans">New Document</span>
