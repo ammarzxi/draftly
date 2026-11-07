@@ -27,8 +27,6 @@ export default function Editor({
   setEditable,
 }) {
   const { mode, setMode } = useGlobal();
-  const [cursorLine, setCursorLine] = useState(1);
-  const [cursorColumn, setCursorColumn] = useState(1);
   const [saved, SetSave] = useState(false);
 
   return (
@@ -120,10 +118,6 @@ export default function Editor({
           editable={editable}
           input={input}
           setInput={setInput}
-          cursorLine={cursorLine}
-          setCursorLine={setCursorLine}
-          cursorColumn={cursorColumn}
-          setCursorColumn={setCursorColumn}
         />
       </div>
       <div
