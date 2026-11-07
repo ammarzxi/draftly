@@ -4,18 +4,14 @@ import { useState } from "react";
 import Intro from "../components/recents/Intro";
 import RecentsList from "../components/layout/documents/RecentsList";
 import Header from "@/app/components/layout/Header"
-
-
-import documentsData from "@/app/data/documents";
 import { useGlobal } from "../context/GlobalVars";
 import Editor from "../components/layout/documents/Editor";
 
 export default function Recent() {
-  const [items, setItems] = useState(documentsData);
+  const { items, setItems, mode, setMode } = useGlobal();
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [input, setInput] = useState("");
-  const { mode, setMode } = useGlobal();
   const [popup, setPopup] = useState(null);
   const [editable, setEditable] = useState(false);
 
@@ -55,12 +51,9 @@ export default function Recent() {
         <div className="py-4">
           <Intro />
           <RecentsList
-            data={documentsData}
             selectedDocument={selectedDocument}
-            items={items}
             folDocs={folDocs}
             selectedFolder={selectedFolder}
-            setItems={setItems}
             setPopup={setPopup}
             setSelectedFolder={setSelectedFolder}
             popup={popup}
@@ -83,7 +76,6 @@ export default function Recent() {
           setInput={handleContentChange}
           // Show starred doc and it's respective folders
           // AWS SERVICES
-
           items={items}
           setItems={setItems}
         />
