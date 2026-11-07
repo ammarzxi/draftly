@@ -6,15 +6,14 @@ import { useState } from "react";
 import Editor from "./components/layout/documents/Editor";
 import Header from "@/app/components/layout/Header"
 import Intro from "@/app/components/home/Intro";
-import documentsData from "@/app/data/documents";
 import List from "./components/layout/documents/List";
 
 export default function App() {
+  const { items, setItems } = useGlobal();
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [input, setInput] = useState("");
   const [popup, setPopup] = useState(null);
-  const [items, setItems] = useState(documentsData);
   const [editable, setEditable] = useState(false);
 
   const folDocs = items.filter(
@@ -56,10 +55,7 @@ export default function App() {
           <Intro />
           <List
             selectedDocument={selectedDocument}
-            items={items}
-            folDocs={folDocs}
             selectedFolder={selectedFolder}
-            setItems={setItems}
             setPopup={setPopup}
             setSelectedFolder={setSelectedFolder}
             popup={popup}
@@ -82,7 +78,6 @@ export default function App() {
           setInput={handleContentChange}
           // Show starred doc and it's respective folders
           // AWS SERVICES
-
           items={items}
           setItems={setItems}
         />
