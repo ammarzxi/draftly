@@ -2,11 +2,9 @@
 
 import CodeMirror from "@uiw/react-codemirror";
 import { markdown } from "@codemirror/lang-markdown";
-import { EditorView, ViewUpdate } from "@codemirror/view";
+import { EditorView } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
-import { TextAlignCenter } from "lucide-react";
-import { useState } from "react";
 
 const customColors = HighlightStyle.define([
   { tag: tags.heading1, color: "#5367F8", fontWeight: "800" },
@@ -71,12 +69,10 @@ const draftlyTheme = EditorView.theme({
 export default function MarkdownEditor({
   input,
   editable,
-  setEditable,
   setInput,
   cursorLine,
   setCursorLine,
   setCursorColumn,
-  setMode,
 }) {
   return (
     <div className="overflow-hidden border border-border pt-4 w-full">
