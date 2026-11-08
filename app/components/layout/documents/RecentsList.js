@@ -12,7 +12,7 @@ export default function RecentsList({
   selectedFolder,
   setEditable,
 }) {
-  const { mode, items } = useGlobal();
+  const { items } = useGlobal();
 
   const actions = useDocumentActions({
     handleSelectFolder,
@@ -49,9 +49,7 @@ export default function RecentsList({
     return (
       <DocumentItems
         items={group}
-        allItems={group}
         folders={folders}
-        mode={null}
         selectedFolder={selectedFolder}
         popup={popup}
         setPopup={setPopup}
