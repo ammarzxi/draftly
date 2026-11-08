@@ -19,11 +19,11 @@ export default function TrashList() {
   const deletedItems = items.filter((item) => {
     if (item.deletedAt == null) return false;
 
-    if (item.type === "Document" && item.deleteId != null) {
+    if (item.type === "Document" && item.folderId != null) {
       const deletedFolder = items.find(
         (folder) =>
           folder.type === "Folder" &&
-          folder.id === item.deleteId &&
+          folder.id === item.folderId &&
           folder.deletedAt != null,
       );
 
