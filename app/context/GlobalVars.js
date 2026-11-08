@@ -6,8 +6,11 @@ import {
   addItem,
   updateItem,
   softDeleteItem,
+  deleteFolderItem,
   restoreItem,
+  restoreFolderItem,
   permanentlyDeleteItem,
+  permanentlyDeleteFolderItem,
 } from "../services/items";
 
 const GlobalContext = createContext(null);
@@ -48,7 +51,7 @@ export default function GlobalProvider({ children }) {
   }
 
   function deleteFolder(id, deletedAt) {
-    setItems((prev) => softDeleteItem(prev, id, "Folder", deletedAt));
+    setItems((prev) => deleteFolderItem(prev, id, deletedAt));
   }
 
   function restoreDocumentItem(id) {
@@ -56,15 +59,15 @@ export default function GlobalProvider({ children }) {
   }
 
   function restoreFolderItem(id) {
-    setItems((prev) => restoreItem(prev, id, "Folder"));
+    setItems((prev) => restoreFolderItem(prev, id));
   }
 
   function permanentlyDeleteDocumentItem(id) {
     setItems((prev) => permanentlyDeleteItem(prev, id, "Document"));
   }
 
-  function permanentlyDeleteFolderItem(id) {
-    setItems((prev) => permanentlyDeleteItem(prev, id, "Folder"));
+  function permanentlyDeleteFolder(id) {
+    setItems((prev) => permanentlyDeleteFolderItem(prev, id));
   }
 
   return (
@@ -84,7 +87,7 @@ export default function GlobalProvider({ children }) {
         restoreDocumentItem,
         restoreFolderItem,
         permanentlyDeleteDocumentItem,
-        permanentlyDeleteFolderItem,
+        permanentlyDeleteFolderItem: permanentlyDeleteFolder,
       }}
     >
       {children}
