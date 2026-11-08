@@ -80,7 +80,7 @@ export default function List({
           items={visibleItems}
           allItems={items}
           folders={folders}
-          mode={mode}
+          mode={tab === "Recent" ? null : mode}
           selectedFolder={selectedFolder}
           popup={popup}
           setPopup={setPopup}
