@@ -10,7 +10,7 @@ import RecentsIntro from "../../recents/Intro";
 import Header from "../Header";
 
 export default function DocumentWorkspace({ variant }) {
-  const { items, mode, setMode, editDocument, editFolder } = useGlobal();
+  const { items, setMode, editDocument, editFolder } = useGlobal();
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [input, setInput] = useState("");
