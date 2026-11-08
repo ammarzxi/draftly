@@ -2,80 +2,79 @@
 
 import documentsData from "../data/documents";
 import { createContext, useContext, useState } from "react";
-
 import {
-  addDocument as addDocumentService,
-  updateDocument,
-  softDeleteDocument,
-  restoreDocument,
-  permanentlyDeleteDocument,
-} from "../services/documents";
+  addItem,
+  updateItem,
+  softDeleteItem,
+  restoreItem,
+  permanentlyDeleteItem,
+} from "../services/items";
 
-import {
-  addFolder as addFolderService,
-  updateFolder,
-  softDeleteFolder,
-  restoreFolder,
-  permanentlyDeleteFolder,
-} from "../services/folders";
-
-const GlobalContext = createContext();
+const GlobalContext = createContext(null);
 
 export function useGlobal() {
-  return useContext(GlobalContext);
+  const context = useContext(GlobalContext);
+
+  if (!context) {
+    throw new Error("useGlobal must be used inside GlobalProvider");
+  }
+
+  return context;
 }
 
 export default function GlobalProvider({ children }) {
   const [items, setItems] = useState(documentsData);
   const [mode, setMode] = useState(null);
+  const [addOpen, setAddOpen] = useState(false);
 
-  const createDocument = (document) => {
-    setItems((prev) => addDocumentService(prev, document));
-  };
+  function createDocument(document) {
+    setItems((prev) => addItem(prev, document));
+  }
 
-  const createFolder = (folder) => {
-    setItems((prev) => addFolderService(prev, folder));
-  };
+  function createFolder(folder) {
+    setItems((prev) => addItem(prev, folder));
+  }
 
-  const editDocument = (id, updates) => {
-    setItems((prev) => updateDocument(prev, id, updates));
-  };
+  function editDocument(id, updates) {
+    setItems((prev) => updateItem(prev, id, "Document", updates));
+  }
 
-  const editFolder = (id, updates) => {
-    setItems((prev) => updateFolder(prev, id, updates));
-  };
+  function editFolder(id, updates) {
+    setItems((prev) => updateItem(prev, id, "Folder", updates));
+  }
 
-  const deleteDocument = (id, deletedAt) => {
-    setItems((prev) => softDeleteDocument(prev, id, deletedAt));
-  };
+  function deleteDocument(id, deletedAt) {
+    setItems((prev) => softDeleteItem(prev, id, "Document", deletedAt));
+  }
 
-  const deleteFolder = (id, deletedAt) => {
-    setItems((prev) => softDeleteFolder(prev, id, deletedAt));
-  };
+  function deleteFolder(id, deletedAt) {
+    setItems((prev) => softDeleteItem(prev, id, "Folder", deletedAt));
+  }
 
-  const restoreDocumentItem = (id) => {
-    setItems((prev) => restoreDocument(prev, id));
-  };
+  function restoreDocumentItem(id) {
+    setItems((prev) => restoreItem(prev, id, "Document"));
+  }
 
-  const restoreFolderItem = (id) => {
-    setItems((prev) => restoreFolder(prev, id));
-  };
+  function restoreFolderItem(id) {
+    setItems((prev) => restoreItem(prev, id, "Folder"));
+  }
 
-  const permanentlyDeleteDocumentItem = (id) => {
-    setItems((prev) => permanentlyDeleteDocument(prev, id));
-  };
+  function permanentlyDeleteDocumentItem(id) {
+    setItems((prev) => permanentlyDeleteItem(prev, id, "Document"));
+  }
 
-  const permanentlyDeleteFolderItem = (id) => {
-    setItems((prev) => permanentlyDeleteFolder(prev, id));
-  };
+  function permanentlyDeleteFolderItem(id) {
+    setItems((prev) => permanentlyDeleteItem(prev, id, "Folder"));
+  }
 
   return (
     <GlobalContext.Provider
       value={{
         items,
-        setItems,
         mode,
         setMode,
+        addOpen,
+        setAddOpen,
         createDocument,
         createFolder,
         editDocument,

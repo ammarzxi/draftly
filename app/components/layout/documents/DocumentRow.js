@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { getRelativeTime, getTypeStyle } from "../../../utils/documents";
+import ConfirmDialog from "../../ui/ConfirmDialog";
 
 export default function DocumentRow({
   item,
@@ -39,40 +40,17 @@ export default function DocumentRow({
       }}
     >
       {confirmDelete && (
-        <div
-          className="fixed inset-0 z-[1000] bg-black/20 flex items-center justify-center"
-          onClick={(event) => {
-            event.stopPropagation();
+        <ConfirmDialog
+          title="Confirm Deletion!"
+          description={`Are you sure you want to delete ${item.title}?`}
+          confirmLabel="Yes, Delete"
+          danger
+          onCancel={() => setConfirmDelete(false)}
+          onConfirm={() => {
+            onDelete(item);
             setConfirmDelete(false);
           }}
-        >
-          <div
-            className="bg-white text-center border border-muted/40 rounded px-6 py-8"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <h3 className="font-semibold text-lg">Confirm Deletion!</h3>
-            <p>Are you sure you want to delete {item.title}?</p>
-            <div className="mt-4 flex items-center gap-x-2 justify-center">
-              <button
-                type="button"
-                onClick={() => setConfirmDelete(false)}
-                className="text-red-500 border border-red-500 px-6 py-2 rounded"
-              >
-                Don&apos;t delete
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  onDelete(item);
-                  setConfirmDelete(false);
-                }}
-                className="bg-red-500 text-white px-6 py-2 rounded"
-              >
-                Yes, Delete
-              </button>
-            </div>
-          </div>
-        </div>
+        />
       )}
 
       <div className="flex p-2 space-x-3 md:space-x-4 hover:bg-muted/20">
@@ -90,7 +68,6 @@ export default function DocumentRow({
           <h3 className="font-heading max-md:text-sm font-semibold truncate">
             {item.title}
           </h3>
-
           <div className="flex items-center justify-between w-full text-sm text-muted gap-x-2">
             <div className="flex items-center gap-x-0 min-w-0">
               <p className="hidden md:block truncate">

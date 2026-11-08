@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { useGlobal } from "@/app/context/GlobalVars";
-import DocumentRow from "./DocumentRow";
+import { useGlobal } from "../../../context/GlobalVars";
+import useDocumentActions from "../../../hooks/useDocumentActions";
+import DocumentItems from "./DocumentItems";
 
 export default function RecentsList({
   handleSelectFolder,
@@ -12,29 +12,16 @@ export default function RecentsList({
   selectedFolder,
   setEditable,
 }) {
-  const {
-    mode,
-    setMode,
-    items,
-    editDocument,
-    editFolder,
-    deleteDocument,
-    deleteFolder,
-  } = useGlobal();
+  const { mode, items } = useGlobal();
 
-  useEffect(() => {
-    const handleClick = (event) => {
-      if (!event.target.closest("[data-popup-wrapper]")) {
-        setPopup(null);
-      }
-    };
+  const actions = useDocumentActions({
+    handleSelectFolder,
+    handleSelectDocument,
+    setEditable,
+    setPopup,
+  });
 
-    document.addEventListener("click", handleClick);
-
-    return () => document.removeEventListener("click", handleClick);
-  }, [setPopup]);
-
-  const foldersData = items.filter((item) => item.type === "Folder");
+  const folders = items.filter((item) => item.type === "Folder");
   const visibleItems = items
     .filter((item) => item.deletedAt === null)
     .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
@@ -56,89 +43,18 @@ export default function RecentsList({
     (item) => new Date(item.updatedAt) < startOfYesterday,
   );
 
-  function handleSelect(item) {
-    if (item.type === "Folder") {
-      handleSelectFolder(item, item.id);
-      setMode("folder");
-    } else {
-      handleSelectDocument(item);
-      setMode("view");
-    }
-
-    setEditable(false);
-  }
-
-  function handleEdit(item) {
-    handleSelectDocument(item);
-    setMode("write");
-    setEditable(true);
-  }
-
-  function handleDelete(item) {
-    const deletedAt = new Date().toISOString();
-
-    if (item.type === "Folder") {
-      deleteFolder(item.id, deletedAt);
-    } else {
-      deleteDocument(item.id, deletedAt);
-    }
-  }
-
-  function toggleStar(item) {
-    const updates = { starred: !item.starred };
-
-    if (item.type === "Folder") {
-      editFolder(item.id, updates);
-    } else {
-      editDocument(item.id, updates);
-    }
-  }
-
   function renderGroup(group) {
-    return group.map((item) => {
-      const folder = foldersData.find((entry) => entry.id === item.folderId);
-      const folderDocs =
-        mode === "folder" && selectedFolder?.id === item.id
-          ? visibleItems.filter(
-              (doc) => doc.type === "Document" && doc.folderId === item.id,
-            )
-          : [];
-
-      return (
-        <DocumentRow
-          key={item.id}
-          item={item}
-          folder={folder}
-          mode={mode}
-          selectedFolder={selectedFolder}
-          popup={popup}
-          setPopup={setPopup}
-          onSelect={handleSelect}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onToggleStar={toggleStar}
-        >
-          {folderDocs.map((doc) => (
-            <DocumentRow
-              key={doc.id}
-              item={doc}
-              mode={mode}
-              selectedFolder={selectedFolder}
-              popup={popup}
-              setPopup={setPopup}
-              onSelect={(selected) => {
-                handleSelectDocument(selected);
-                setMode("view");
-                setEditable(false);
-              }}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onToggleStar={toggleStar}
-            />
-          ))}
-        </DocumentRow>
-      );
-    });
+    return (
+      <DocumentItems
+        items={group}
+        folders={folders}
+        mode={mode}
+        selectedFolder={selectedFolder}
+        popup={popup}
+        setPopup={setPopup}
+        actions={actions}
+      />
+    );
   }
 
   return (

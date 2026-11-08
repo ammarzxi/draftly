@@ -4,103 +4,117 @@ import { useState } from "react";
 import { useGlobal } from "../../../context/GlobalVars";
 
 export default function AddDoc() {
-  const { items, handleAddition, setConfirm, itemType, setItemType } =
-    useGlobal();
+  const { items, createDocument, createFolder, setAddOpen } = useGlobal();
+  const [itemType, setItemType] = useState("Document");
+  const [title, setTitle] = useState("");
+  const [folderId, setFolderId] = useState("");
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    const cleanTitle = title.trim();
+    if (!cleanTitle) return;
+
+    const now = new Date().toISOString();
+    const item = {
+      id: crypto.randomUUID(),
+      title: cleanTitle,
+      type: itemType,
+      folderId: itemType === "Document" && folderId ? folderId : null,
+      deletedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    if (itemType === "Folder") {
+      createFolder(item);
+    } else {
+      createDocument(item);
+    }
+
+    setAddOpen(false);
+  }
+
+  const folders = items.filter(
+    (item) => item.type === "Folder" && item.deletedAt === null,
+  );
 
   return (
-    <section>
-      <form onSubmit={(event) => handleAddition(event, itemType)}>
-        <div className="fixed z-[1000] bg-white top-40 left-135 border-muted/40 border rounded px-6 py-8 w-96">
-          <h3 className="font-semibold text-lg">Create {itemType}</h3>
-          <p className="text-muted-foreground text-sm mt-1">
-            Create a new {itemType.toLowerCase()} for your workspace.
-          </p>
+    <section className="fixed inset-0 z-[1000] bg-black/20 flex items-center justify-center p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white border-muted/40 border rounded px-6 py-8 w-96 max-w-full"
+      >
+        <h3 className="font-semibold text-lg">Create {itemType}</h3>
+        <p className="text-muted-foreground text-sm mt-1">
+          Create a new {itemType.toLowerCase()} for your workspace.
+        </p>
 
-          <div className="flex bg-muted/20 p-1 rounded-full mt-6">
-            <button
-              type="button"
-              onClick={() => setItemType("Document")}
-              className={`flex-1 py-2 text-sm rounded-full ${
-                itemType === "Document" ? "bg-white shadow-sm" : "text-muted"
-              }`}
-            >
-              Document
-            </button>
+        <div className="flex bg-muted/20 p-1 rounded-full mt-6">
+          <button
+            type="button"
+            onClick={() => setItemType("Document")}
+            className={`flex-1 py-2 text-sm rounded-full ${itemType === "Document" ? "bg-white shadow-sm" : "text-muted"}`}
+          >
+            Document
+          </button>
+          <button
+            type="button"
+            onClick={() => setItemType("Folder")}
+            className={`flex-1 py-2 text-sm rounded-full ${itemType === "Folder" ? "bg-white shadow-sm" : "text-muted"}`}
+          >
+            Folder
+          </button>
+        </div>
 
-            <button
-              type="button"
-              onClick={() => setItemType("Folder")}
-              className={`flex-1 py-2 text-sm rounded-full ${
-                itemType === "Folder" ? "bg-white shadow-sm" : "text-muted"
-              }`}
-            >
-              Folder
-            </button>
-          </div>
+        <div className="mt-6">
+          <label className="text-sm font-medium">
+            {itemType === "Document" ? "Document Title" : "Folder Name"}
+          </label>
+          <input
+            type="text"
+            name="title"
+            value={title}
+            required
+            autoFocus
+            onChange={(event) => setTitle(event.target.value)}
+            placeholder={itemType === "Document" ? "Enter document title" : "Enter folder name"}
+            className="w-full border border-muted/40 rounded px-3 py-2 mt-2 outline-none"
+          />
+        </div>
 
-          <div className="mt-6">
-            <label className="text-sm font-medium">
-              {itemType === "Document" ? "Document Title" : "Folder Name"}
-            </label>
-
-            <input
-              type="text"
-              name="title"
-              placeholder={
-                itemType === "Document"
-                  ? "Enter document title"
-                  : "Enter folder name"
-              }
+        {itemType === "Document" && (
+          <div className="mt-4">
+            <label className="text-sm font-medium">Folder</label>
+            <select
+              value={folderId}
+              onChange={(event) => setFolderId(event.target.value)}
               className="w-full border border-muted/40 rounded px-3 py-2 mt-2 outline-none"
-            />
-          </div>
-
-          {itemType === "Document" && (
-            <>
-              {/* <div className="mt-4">
-                                <label className="text-sm font-medium">Document Type</label>
-                                <select name="type" className="w-full border border-muted/40 rounded px-3 py-2 mt-2 outline-none">
-                                    <option value="">Select document type</option>
-                                    <option value="Document">Document</option>
-                                    <option value="Note">Note</option>
-                                </select>
-                            </div> */}
-
-              <div className="mt-4">
-                <label className="text-sm font-medium">Folder</label>
-                <select
-                  name="folderName"
-                  className="w-full border border-muted/40 rounded px-3 py-2 mt-2 outline-none"
-                >
-                  <option value="">No folder</option>
-                  {items
-                    .filter((item) => item.type === "Folder")
-                    .map((item) => (
-                      <option key={item.id} value={item.title}>
-                        {item.title}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            </>
-          )}
-
-          <div className="mt-6 flex items-center gap-x-2 justify-end">
-            <button
-              type="button"
-              className="text-red-500 border border-red-500 px-5 py-2 cursor-pointer rounded"
-              onClick={() => setConfirm(false)}
             >
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              className="bg-primary text-white px-5 py-2 rounded cursor-pointer"
-            >
-              Create {itemType}
-            </button>
+              <option value="">No folder</option>
+              {folders.map((folder) => (
+                <option key={folder.id} value={folder.id}>
+                  {folder.title}
+                </option>
+              ))}
+            </select>
           </div>
+        )}
+
+        <div className="mt-6 flex items-center gap-x-2 justify-end">
+          <button
+            type="button"
+            className="text-red-500 border border-red-500 px-5 py-2 cursor-pointer rounded"
+            onClick={() => setAddOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="bg-primary text-white px-5 py-2 rounded cursor-pointer"
+          >
+            Create {itemType}
+          </button>
         </div>
       </form>
     </section>

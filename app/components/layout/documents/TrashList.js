@@ -4,6 +4,7 @@ import { FileText, Folder, Dot, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useGlobal } from "../../../context/GlobalVars";
 import { getTypeStyle } from "../../../utils/documents";
+import ConfirmDialog from "../../ui/ConfirmDialog";
 
 export default function TrashList() {
   const {
@@ -13,8 +14,7 @@ export default function TrashList() {
     permanentlyDeleteDocumentItem,
     permanentlyDeleteFolderItem,
   } = useGlobal();
-  const [restoreId, setRestoreId] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
+  const [confirmation, setConfirmation] = useState(null);
 
   const deletedItems = items.filter((item) => item.deletedAt != null);
   const foldersData = items.filter(
@@ -37,10 +37,34 @@ export default function TrashList() {
     }
   }
 
+  function confirmAction() {
+    const item = deletedItems.find((entry) => entry.id === confirmation.id);
+    if (!item) return;
+
+    if (confirmation.action === "restore") {
+      handleRestore(item);
+    } else {
+      handleDelete(item);
+    }
+
+    setConfirmation(null);
+  }
+
   return (
     <section className="space-y-4 pt-4">
-      {(restoreId !== null || deleteId !== null) && (
-        <div className="fixed inset-0 min-h-screen z-[1000] bg-black/20" />
+      {confirmation && (
+        <ConfirmDialog
+          title={confirmation.action === "restore" ? "Confirm Restoration!" : "Confirm Permanent Deletion!"}
+          description={
+            confirmation.action === "restore"
+              ? `Are you sure you want to restore ${confirmation.title}?`
+              : `Are you sure you want to permanently delete ${confirmation.title}?`
+          }
+          confirmLabel={confirmation.action === "restore" ? "Yes, Restore" : "Yes, Delete"}
+          danger={confirmation.action === "delete"}
+          onCancel={() => setConfirmation(null)}
+          onConfirm={confirmAction}
+        />
       )}
 
       <div className="space-y-4">
@@ -59,62 +83,6 @@ export default function TrashList() {
               key={item.id}
               className="flex items-center p-2 space-x-3 md:space-x-4 hover:bg-muted/20"
             >
-              {restoreId === item.id && (
-                <div
-                  className="fixed z-[1000] bg-white top-60 left-135 text-center border-muted/40 border rounded px-6 py-12"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <h3 className="font-semibold text-lg">Confirm Restoration!</h3>
-                  <p>Are you sure you want to restore {item.title}?</p>
-                  <div className="mt-4 flex items-center gap-x-2 justify-center">
-                    <button
-                      onClick={() => setRestoreId(null)}
-                      className="text-red-500 border border-red-500 px-6 py-2 rounded"
-                    >
-                      Don&apos;t restore
-                    </button>
-                    <button
-                      onClick={() => {
-                        setRestoreId(null);
-                        handleRestore(item);
-                      }}
-                      className="bg-primary text-white px-6 py-2 rounded"
-                    >
-                      Yes, Restore
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {deleteId === item.id && (
-                <div
-                  className="fixed z-[1000] bg-white top-60 left-135 text-center border-muted/40 border rounded px-6 py-12"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <h3 className="font-semibold text-lg">
-                    Confirm Permanent Deletion!
-                  </h3>
-                  <p>Are you sure you want to permanently delete {item.title}?</p>
-                  <div className="mt-4 flex items-center gap-x-2 justify-center">
-                    <button
-                      onClick={() => setDeleteId(null)}
-                      className="text-red-500 border border-red-500 px-6 py-2 rounded"
-                    >
-                      Don&apos;t delete
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDeleteId(null);
-                        handleDelete(item);
-                      }}
-                      className="bg-red-500 text-white px-6 py-2 rounded"
-                    >
-                      Yes, Delete
-                    </button>
-                  </div>
-                </div>
-              )}
-
               <div
                 className={"flex " + getTypeStyle(item.type) + " items-center justify-center md:px-3 md:py-3 px-3 rounded"}
               >
@@ -144,14 +112,14 @@ export default function TrashList() {
                     <button
                       type="button"
                       className="text-primary border border-primary/30 px-3 py-1 rounded text-xs hover:bg-primary/10"
-                      onClick={() => setRestoreId(item.id)}
+                      onClick={() => setConfirmation({ id: item.id, title: item.title, action: "restore" })}
                     >
                       Restore
                     </button>
                     <button
                       type="button"
                       className="text-red-500 border border-red-500/30 px-3 py-1 rounded text-xs hover:bg-red-500/10"
-                      onClick={() => setDeleteId(item.id)}
+                      onClick={() => setConfirmation({ id: item.id, title: item.title, action: "delete" })}
                     >
                       Delete
                     </button>
