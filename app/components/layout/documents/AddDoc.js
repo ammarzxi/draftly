@@ -3,11 +3,16 @@
 import { useState } from "react";
 import { useGlobal } from "../../../context/GlobalVars";
 
-export default function AddDoc() {
+export default function AddDoc({ currentFolder, onClose }) {
   const { items, createDocument, createFolder, setAddOpen } = useGlobal();
   const [itemType, setItemType] = useState("Document");
   const [title, setTitle] = useState("");
-  const [folderId, setFolderId] = useState("");
+  const [folderId, setFolderId] = useState(currentFolder?.id ?? "");
+
+  function closeModal() {
+    setAddOpen(false);
+    onClose?.();
+  }
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -16,8 +21,11 @@ export default function AddDoc() {
     if (!cleanTitle) return;
 
     const now = new Date().toISOString();
-    const selectedFolder = items.find(
-      (item) => item.type === "Folder" && String(item.id) === folderId,
+    const selectedFolder = currentFolder || items.find(
+      (item) =>
+        item.type === "Folder" &&
+        item.deletedAt === null &&
+        String(item.id) === String(folderId),
     );
     const item = {
       id: crypto.randomUUID(),
@@ -25,6 +33,7 @@ export default function AddDoc() {
       type: itemType,
       folderId: itemType === "Document" ? selectedFolder?.id ?? null : null,
       deletedAt: null,
+      deleteId: null,
       createdAt: now,
       updatedAt: now,
     };
@@ -35,7 +44,7 @@ export default function AddDoc() {
       createDocument(item);
     }
 
-    setAddOpen(false);
+    closeModal();
   }
 
   const folders = items.filter(
@@ -53,22 +62,24 @@ export default function AddDoc() {
           Create a new {itemType.toLowerCase()} for your workspace.
         </p>
 
-        <div className="flex bg-muted/20 p-1 rounded-full mt-6">
-          <button
-            type="button"
-            onClick={() => setItemType("Document")}
-            className={`flex-1 py-2 text-sm rounded-full ${itemType === "Document" ? "bg-white shadow-sm" : "text-muted"}`}
-          >
-            Document
-          </button>
-          <button
-            type="button"
-            onClick={() => setItemType("Folder")}
-            className={`flex-1 py-2 text-sm rounded-full ${itemType === "Folder" ? "bg-white shadow-sm" : "text-muted"}`}
-          >
-            Folder
-          </button>
-        </div>
+        {!currentFolder && (
+          <div className="flex bg-muted/20 p-1 rounded-full mt-6">
+            <button
+              type="button"
+              onClick={() => setItemType("Document")}
+              className={`flex-1 py-2 text-sm rounded-full ${itemType === "Document" ? "bg-white shadow-sm" : "text-muted"}`}
+            >
+              Document
+            </button>
+            <button
+              type="button"
+              onClick={() => setItemType("Folder")}
+              className={`flex-1 py-2 text-sm rounded-full ${itemType === "Folder" ? "bg-white shadow-sm" : "text-muted"}`}
+            >
+              Folder
+            </button>
+          </div>
+        )}
 
         <div className="mt-6">
           <label className="text-sm font-medium">
@@ -86,7 +97,7 @@ export default function AddDoc() {
           />
         </div>
 
-        {itemType === "Document" && (
+        {itemType === "Document" && !currentFolder && (
           <div className="mt-4">
             <label className="text-sm font-medium">Folder</label>
             <select
@@ -104,11 +115,17 @@ export default function AddDoc() {
           </div>
         )}
 
+        {currentFolder && (
+          <p className="mt-4 text-sm text-muted">
+            Creating inside: {currentFolder.title}
+          </p>
+        )}
+
         <div className="mt-6 flex items-center gap-x-2 justify-end">
           <button
             type="button"
             className="text-red-500 border border-red-500 px-5 py-2 cursor-pointer rounded"
-            onClick={() => setAddOpen(false)}
+            onClick={closeModal}
           >
             Cancel
           </button>
