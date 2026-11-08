@@ -16,11 +16,14 @@ export default function AddDoc() {
     if (!cleanTitle) return;
 
     const now = new Date().toISOString();
+    const selectedFolder = items.find(
+      (item) => item.type === "Folder" && String(item.id) === folderId,
+    );
     const item = {
       id: crypto.randomUUID(),
       title: cleanTitle,
       type: itemType,
-      folderId: itemType === "Document" && folderId ? folderId : null,
+      folderId: itemType === "Document" ? selectedFolder?.id ?? null : null,
       deletedAt: null,
       createdAt: now,
       updatedAt: now,
