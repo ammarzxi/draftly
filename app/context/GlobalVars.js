@@ -8,7 +8,7 @@ import {
   softDeleteItem,
   deleteFolderItem,
   restoreItem,
-  restoreFolderItem,
+  restoreFolderItem as restoreFolderItems,
   permanentlyDeleteItem,
   permanentlyDeleteFolderItem,
 } from "../services/items";
@@ -59,7 +59,7 @@ export default function GlobalProvider({ children }) {
   }
 
   function restoreFolderItem(id) {
-    setItems((prev) => restoreFolderItem(prev, id));
+    setItems((prev) => restoreFolderItems(prev, id));
   }
 
   function permanentlyDeleteDocumentItem(id) {
