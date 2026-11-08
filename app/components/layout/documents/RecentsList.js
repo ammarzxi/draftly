@@ -51,7 +51,7 @@ export default function RecentsList({
         items={group}
         allItems={group}
         folders={folders}
-        mode={mode}
+        mode={null}
         selectedFolder={selectedFolder}
         popup={popup}
         setPopup={setPopup}
