@@ -21,7 +21,9 @@ export default function RecentsList({
     setPopup,
   });
 
-  const folders = items.filter((item) => item.type === "Folder");
+  const folders = items.filter(
+    (item) => item.type === "Folder" && item.deletedAt === null,
+  );
   const visibleItems = items
     .filter((item) => item.deletedAt === null)
     .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
@@ -47,7 +49,7 @@ export default function RecentsList({
     return (
       <DocumentItems
         items={group}
-        allItems={visibleItems}
+        allItems={group}
         folders={folders}
         mode={mode}
         selectedFolder={selectedFolder}
@@ -76,9 +78,7 @@ export default function RecentsList({
 
       {earlier.length > 0 && (
         <div>
-          <h3 className="font-heading font-semibold text-lg mb-2">
-            Earlier this week
-          </h3>
+          <h3 className="font-heading font-semibold text-lg mb-2">Earlier</h3>
           {renderGroup(earlier)}
         </div>
       )}
