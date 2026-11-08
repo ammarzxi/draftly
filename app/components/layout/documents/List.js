@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useGlobal } from "../../../context/GlobalVars";
 import useDocumentActions from "../../../hooks/useDocumentActions";
-import AddOnlyDoc from "./AddOnlyDoc";
+import AddDoc from "./AddDoc";
 import DocumentItems from "./DocumentItems";
 
 const buttons = ["All", "Recent", "Starred", "Folders"];
@@ -17,7 +17,6 @@ export default function List({
   selectedFolder,
   setEditable,
 }) {
-  const [newDoc, setNewDoc] = useState(false);
   const [activeFolder, setActiveFolder] = useState(null);
   const [tab, setTab] = useState("All");
   const { mode, items } = useGlobal();
@@ -49,7 +48,9 @@ export default function List({
         });
 
   const visibleItems = filteredItems.filter((item) => item.deletedAt === null);
-  const folders = items.filter((item) => item.type === "Folder");
+  const folders = items.filter(
+    (item) => item.type === "Folder" && item.deletedAt === null,
+  );
 
   return (
     <section className="space-y-4 pt-4">
@@ -84,10 +85,7 @@ export default function List({
           popup={popup}
           setPopup={setPopup}
           actions={actions}
-          onAddDocument={(folder) => {
-            setActiveFolder(folder);
-            setNewDoc(true);
-          }}
+          onAddDocument={setActiveFolder}
         />
       </div>
 
@@ -99,8 +97,11 @@ export default function List({
         <p>Empty List! Add some to get started</p>
       )}
 
-      {newDoc && (
-        <AddOnlyDoc currentFolder={activeFolder} setNewDoc={setNewDoc} />
+      {activeFolder && (
+        <AddDoc
+          currentFolder={activeFolder}
+          onClose={() => setActiveFolder(null)}
+        />
       )}
     </section>
   );
