@@ -27,7 +27,7 @@ export default function Editor({
 
   return (
     <section
-      className={\`min-w-0 border border-muted/40 xl:grid-cols-2 flex-1 overflow-hidden rounded-xl bg-white shadow-2xl \${mode === "write" || mode === "preview" || mode === "view" ? "grid grid-cols-1 absolute w-full" : "hidden"}\`}
+      className={`min-w-0 border border-muted/40 xl:grid-cols-2 flex-1 overflow-hidden rounded-xl bg-white shadow-2xl ${mode === "write" || mode === "preview" || mode === "view" ? "grid grid-cols-1 absolute w-full" : "hidden"}`}
     >
       <div className="col-span-full border-b border-muted/40 flex justify-between p-3 flex-col">
         <div className="flex items-center justify-between">
@@ -72,16 +72,14 @@ export default function Editor({
               </span>
             )}
           </div>
-          <div className="flex items-center justify-between text-muted gap-x-4 text-sm mt-2">
-            <p className="flex items-center gap-x-1">
-              <AlertCircle className="text-red-600" size={20} /> Couldn&apos;t save
-            </p>
-          </div>
+          <div className="text-muted text-sm mt-2">
+  Changes update as you type
+</div>
         </div>
       </div>
 
       <div
-        className={\`\${mode === "write" || mode === "view" ? "flex" : "hidden"} h-190 overflow-y-auto gap-x-4\`}
+        className={`${mode === "write" || mode === "view" ? "flex" : "hidden"} h-190 overflow-y-auto gap-x-4`}
       >
         <TextArea
           editable={editable}
@@ -91,7 +89,7 @@ export default function Editor({
       </div>
 
       <div
-        className={\`\${mode === "preview" ? "block" : "hidden xl:block"} prose *:my-2 h-190 overflow-y-auto py-4 px-4\`}
+        className={`${mode === "preview" ? "block" : "hidden xl:block"} prose *:my-2 h-190 overflow-y-auto py-4 px-4`}
       >
         <Markdown remarkPlugins={[remarkGfm]}>{input}</Markdown>
       </div>
