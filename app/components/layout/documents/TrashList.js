@@ -16,10 +16,23 @@ export default function TrashList() {
   } = useGlobal();
   const [confirmation, setConfirmation] = useState(null);
 
-  const deletedItems = items.filter((item) => item.deletedAt != null);
-  const foldersData = items.filter(
-    (item) => item.type === "Folder" && item.deletedAt == null,
-  );
+  const deletedItems = items.filter((item) => {
+    if (item.deletedAt == null) return false;
+
+    if (item.type === "Document" && item.deleteId != null) {
+      const deletedFolder = items.find(
+        (folder) =>
+          folder.type === "Folder" &&
+          folder.id === item.deleteId &&
+          folder.deletedAt != null,
+      );
+
+      if (deletedFolder) return false;
+    }
+
+    return true;
+  });
+  const foldersData = items.filter((item) => item.type === "Folder");
 
   function handleDelete(item) {
     if (item.type === "Folder") {
