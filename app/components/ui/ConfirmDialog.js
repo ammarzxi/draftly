@@ -10,7 +10,10 @@ export default function ConfirmDialog({
   return (
     <div
       className="fixed inset-0 z-[1000] bg-black/20 flex items-center justify-center p-4"
-      onClick={onCancel}
+      onClick={(event) => {
+        event.stopPropagation();
+        onCancel();
+      }}
     >
       <div
         className="bg-white text-center border border-muted/40 rounded px-6 py-8 max-w-full"

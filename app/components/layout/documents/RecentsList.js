@@ -47,6 +47,7 @@ export default function RecentsList({
     return (
       <DocumentItems
         items={group}
+        allItems={visibleItems}
         folders={folders}
         mode={mode}
         selectedFolder={selectedFolder}

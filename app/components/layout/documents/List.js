@@ -77,6 +77,7 @@ export default function List({
       <div className="space-y-2">
         <DocumentItems
           items={visibleItems}
+          allItems={items}
           folders={folders}
           mode={mode}
           selectedFolder={selectedFolder}

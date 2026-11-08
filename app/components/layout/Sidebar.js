@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Folder, House, Pencil, Plus, Star, Trash } from "lucide-react";
+import { Clock, House, Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -11,11 +11,6 @@ const links = [
     icon: House,
   },
   {
-    title: "Starred",
-    href: "/starred",
-    icon: Star,
-  },
-  {
     title: "Recent",
     href: "/recents",
     icon: Clock,
@@ -24,24 +19,6 @@ const links = [
     title: "Trash",
     href: "/trash",
     icon: Trash,
-  },
-];
-
-const folderLinks = [
-  {
-    title: "Personal",
-    href: "/",
-    icon: Folder,
-  },
-  {
-    title: "Work",
-    href: "/starred",
-    icon: Folder,
-  },
-  {
-    title: "Ideas",
-    href: "/recent",
-    icon: Folder,
   },
 ];
 
@@ -56,41 +33,19 @@ export default function Sidebar() {
       </div>
 
       <nav className="space-y-3">
-        {links.map((link, i) => {
+        {links.map((link) => {
           const Icon = link.icon;
           const isActive = pathname === link.href;
 
           return (
-            <div
-              key={i}
+            <Link
+              key={link.href}
+              href={link.href}
               className={`flex text-sm items-center space-x-2 py-2 rounded-lg px-2 ${isActive ? "bg-primary/20 text-primary" : ""}`}
             >
               <Icon size={20} />
-              <Link href={link.href}>{link.title}</Link>
-            </div>
-          );
-        })}
-      </nav>
-
-      <nav className="space-y-3 mt-8">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted">Folders</span>
-          <Plus className="text-muted" size={15} />
-        </div>
-
-        {folderLinks.map((link, i) => {
-          const Icon = link.icon;
-          // Do something abt isActive in this making hte bg of prject folder gray or blue
-          const isActive = pathname === link.href;
-
-          return (
-            <div
-              key={i}
-              className={`flex text-sm items-center space-x-2 py-2 rounded-lg px-2 ${isActive ? "bg-muted/20" : ""}`}
-            >
-              <Icon size={20} />
-              <Link href={link.href}>{link.title}</Link>
-            </div>
+              <span>{link.title}</span>
+            </Link>
           );
         })}
       </nav>

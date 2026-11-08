@@ -2,6 +2,7 @@ import DocumentRow from "./DocumentRow";
 
 export default function DocumentItems({
   items,
+  allItems = items,
   folders,
   mode,
   selectedFolder,
@@ -14,7 +15,7 @@ export default function DocumentItems({
     const folder = folders.find((entry) => entry.id === item.folderId);
     const folderDocs =
       mode === "folder" && selectedFolder?.id === item.id
-        ? items.filter(
+        ? allItems.filter(
             (doc) =>
               doc.type === "Document" &&
               doc.folderId === item.id &&
