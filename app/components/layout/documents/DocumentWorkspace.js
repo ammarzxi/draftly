@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGlobal } from "../../../context/GlobalVars";
 import Editor from "./Editor";
 import List from "./List";
@@ -10,24 +10,36 @@ import RecentsIntro from "../../recents/Intro";
 import Header from "../Header";
 
 export default function DocumentWorkspace({ variant }) {
-  const { editDocument, editFolder } = useGlobal();
-  const [selectedDocument, setSelectedDocument] = useState(null);
-  const [selectedFolder, setSelectedFolder] = useState(null);
+  const { items, mode, setMode, editDocument, editFolder } = useGlobal();
+  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [input, setInput] = useState("");
   const [popup, setPopup] = useState(null);
   const [editable, setEditable] = useState(false);
 
+  const selectedDocument = items.find(
+    (item) => item.id === selectedItemId && item.deletedAt === null,
+  ) || null;
+  const selectedFolder = items.find(
+    (item) => item.id === selectedFolderId && item.type === "Folder" && item.deletedAt === null,
+  ) || null;
+
+  useEffect(() => {
+    if (selectedItemId && !selectedDocument) {
+      setSelectedItemId(null);
+      setInput("");
+      setEditable(false);
+      setMode("folder");
+    }
+  }, [selectedItemId, selectedDocument, setMode]);
+
   function handleSelectDocument(doc) {
-    setSelectedDocument(doc);
+    setSelectedItemId(doc.id);
     setInput(doc.content ?? "");
   }
 
   function handleSelectFolder(folder, id) {
-    if (selectedFolder?.id === id) {
-      setSelectedFolder(null);
-    } else {
-      setSelectedFolder(folder);
-    }
+    setSelectedFolderId((prev) => prev === id ? null : folder.id);
   }
 
   function handleContentChange(content) {
@@ -42,8 +54,6 @@ export default function DocumentWorkspace({ variant }) {
   }
 
   function handleTitleChange(title) {
-    setSelectedDocument((prev) => prev ? { ...prev, title } : prev);
-
     if (selectedDocument?.type === "Folder") {
       editFolder(selectedDocument.id, {
         title,
@@ -70,7 +80,7 @@ export default function DocumentWorkspace({ variant }) {
             selectedFolder={selectedFolder}
             setPopup={setPopup}
             popup={popup}
-            setSelectedFolder={setSelectedFolder}
+            setSelectedFolder={setSelectedFolderId}
             setEditable={setEditable}
             handleSelectDocument={handleSelectDocument}
             handleSelectFolder={handleSelectFolder}
