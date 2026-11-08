@@ -45,7 +45,7 @@ export default function Editor({
 
           <div className="flex items-center justify-between gap-x-2">
             <div className="flex items-center gap-x-2">
-              <Pencil onClick={() => setEditable(true)} />
+              <Pencil onClick={() => { setMode("write"); setEditable(true); }} />
               <Save onClick={() => setEditable(false)} />
             </div>
             <div className="xl:hidden">
