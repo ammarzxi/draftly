@@ -7,13 +7,8 @@ export default function useDocumentActions({
   setEditable,
   setPopup,
 }) {
-  const {
-    setMode,
-    editDocument,
-    editFolder,
-    deleteDocument,
-    deleteFolder,
-  } = useGlobal();
+  const { setMode, editDocument, editFolder, deleteDocument, deleteFolder } =
+    useGlobal();
 
   useEffect(() => {
     const handleClick = (event) => {

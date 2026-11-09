@@ -45,7 +45,12 @@ export default function Editor({
 
           <div className="flex items-center justify-between gap-x-2">
             <div className="flex items-center gap-x-2">
-              <Pencil onClick={() => { setMode("write"); setEditable(true); }} />
+              <Pencil
+                onClick={() => {
+                  setMode("write");
+                  setEditable(true);
+                }}
+              />
               <Save onClick={() => setEditable(false)} />
             </div>
             <div className="xl:hidden">
@@ -73,19 +78,15 @@ export default function Editor({
             )}
           </div>
           <div className="text-muted text-sm mt-2">
-  Changes update as you type
-</div>
+            Changes update as you type
+          </div>
         </div>
       </div>
 
       <div
         className={`${mode === "write" || mode === "view" ? "flex" : "hidden"} h-190 overflow-y-auto gap-x-4`}
       >
-        <TextArea
-          editable={editable}
-          input={input}
-          setInput={onInputChange}
-        />
+        <TextArea editable={editable} input={input} setInput={onInputChange} />
       </div>
 
       <div

@@ -21,17 +21,19 @@ export default function AddDoc({ currentFolder, onClose }) {
     if (!cleanTitle) return;
 
     const now = new Date().toISOString();
-    const selectedFolder = currentFolder || items.find(
-      (item) =>
-        item.type === "Folder" &&
-        item.deletedAt === null &&
-        String(item.id) === String(folderId),
-    );
+    const selectedFolder =
+      currentFolder ||
+      items.find(
+        (item) =>
+          item.type === "Folder" &&
+          item.deletedAt === null &&
+          String(item.id) === String(folderId),
+      );
     const item = {
       id: crypto.randomUUID(),
       title: cleanTitle,
       type: itemType,
-      folderId: itemType === "Document" ? selectedFolder?.id ?? null : null,
+      folderId: itemType === "Document" ? (selectedFolder?.id ?? null) : null,
       deletedAt: null,
       deleteId: null,
       createdAt: now,
@@ -92,7 +94,11 @@ export default function AddDoc({ currentFolder, onClose }) {
             required
             autoFocus
             onChange={(event) => setTitle(event.target.value)}
-            placeholder={itemType === "Document" ? "Enter document title" : "Enter folder name"}
+            placeholder={
+              itemType === "Document"
+                ? "Enter document title"
+                : "Enter folder name"
+            }
             className="w-full border border-muted/40 rounded px-3 py-2 mt-2 outline-none"
           />
         </div>

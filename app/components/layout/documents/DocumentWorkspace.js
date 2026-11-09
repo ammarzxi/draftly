@@ -17,12 +17,17 @@ export default function DocumentWorkspace({ variant }) {
   const [popup, setPopup] = useState(null);
   const [editable, setEditable] = useState(false);
 
-  const selectedDocument = items.find(
-    (item) => item.id === selectedItemId && item.deletedAt === null,
-  ) || null;
-  const selectedFolder = items.find(
-    (item) => item.id === selectedFolderId && item.type === "Folder" && item.deletedAt === null,
-  ) || null;
+  const selectedDocument =
+    items.find(
+      (item) => item.id === selectedItemId && item.deletedAt === null,
+    ) || null;
+  const selectedFolder =
+    items.find(
+      (item) =>
+        item.id === selectedFolderId &&
+        item.type === "Folder" &&
+        item.deletedAt === null,
+    ) || null;
 
   useEffect(() => {
     if (selectedItemId && !selectedDocument) {
@@ -39,7 +44,7 @@ export default function DocumentWorkspace({ variant }) {
   }
 
   function handleSelectFolder(folder, id) {
-    setSelectedFolderId((prev) => prev === id ? null : folder.id);
+    setSelectedFolderId((prev) => (prev === id ? null : folder.id));
   }
 
   function handleContentChange(content) {

@@ -90,12 +90,11 @@ export default function List({
       </div>
 
       <span className="text-muted text-sm flex items-center justify-center mt-4">
-        {visibleItems.filter((item) => item.type === "Document").length} documents.
+        {visibleItems.filter((item) => item.type === "Document").length}{" "}
+        documents.
       </span>
 
-      {visibleItems.length === 0 && (
-        <p>Empty List! Add some to get started</p>
-      )}
+      {visibleItems.length === 0 && <p>Empty List! Add some to get started</p>}
 
       {activeFolder && (
         <AddDoc

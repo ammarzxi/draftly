@@ -67,13 +67,19 @@ export default function TrashList() {
     <section className="space-y-4 pt-4">
       {confirmation && (
         <ConfirmDialog
-          title={confirmation.action === "restore" ? "Confirm Restoration!" : "Confirm Permanent Deletion!"}
+          title={
+            confirmation.action === "restore"
+              ? "Confirm Restoration!"
+              : "Confirm Permanent Deletion!"
+          }
           description={
             confirmation.action === "restore"
               ? `Are you sure you want to restore ${confirmation.title}?`
               : `Are you sure you want to permanently delete ${confirmation.title}?`
           }
-          confirmLabel={confirmation.action === "restore" ? "Yes, Restore" : "Yes, Delete"}
+          confirmLabel={
+            confirmation.action === "restore" ? "Yes, Restore" : "Yes, Delete"
+          }
           danger={confirmation.action === "delete"}
           onCancel={() => setConfirmation(null)}
           onConfirm={confirmAction}
@@ -82,7 +88,9 @@ export default function TrashList() {
 
       <div className="space-y-4">
         {deletedItems.map((item) => {
-          const folder = foldersData.find((entry) => entry.id === item.folderId);
+          const folder = foldersData.find(
+            (entry) => entry.id === item.folderId,
+          );
           const deletedAt = item.deletedAt
             ? new Date(item.deletedAt).toLocaleDateString("en-US", {
                 month: "short",
@@ -97,7 +105,11 @@ export default function TrashList() {
               className="flex items-center p-2 space-x-3 md:space-x-4 hover:bg-muted/20"
             >
               <div
-                className={"flex " + getTypeStyle(item.type) + " items-center justify-center md:px-3 md:py-3 px-3 rounded"}
+                className={
+                  "flex " +
+                  getTypeStyle(item.type) +
+                  " items-center justify-center md:px-3 md:py-3 px-3 rounded"
+                }
               >
                 {item.type === "Document" ? (
                   <FileText className="h-6 w-6" />
@@ -125,14 +137,26 @@ export default function TrashList() {
                     <button
                       type="button"
                       className="text-primary border border-primary/30 px-3 py-1 rounded text-xs hover:bg-primary/10"
-                      onClick={() => setConfirmation({ id: item.id, title: item.title, action: "restore" })}
+                      onClick={() =>
+                        setConfirmation({
+                          id: item.id,
+                          title: item.title,
+                          action: "restore",
+                        })
+                      }
                     >
                       Restore
                     </button>
                     <button
                       type="button"
                       className="text-red-500 border border-red-500/30 px-3 py-1 rounded text-xs hover:bg-red-500/10"
-                      onClick={() => setConfirmation({ id: item.id, title: item.title, action: "delete" })}
+                      onClick={() =>
+                        setConfirmation({
+                          id: item.id,
+                          title: item.title,
+                          action: "delete",
+                        })
+                      }
                     >
                       Delete
                     </button>

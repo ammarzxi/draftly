@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-
 const links = [
   {
     title: "Home",
@@ -27,7 +26,7 @@ const links = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const {mode, setMode} = useGlobal();
+  const { mode, setMode } = useGlobal();
 
   return (
     <aside className="max-w-45 px-2 hidden bg-muted/10 lg:block flex-1 pl-3">

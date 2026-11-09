@@ -54,7 +54,13 @@ export default function DocumentRow({
       )}
 
       <div className="flex p-2 space-x-3 md:space-x-4 hover:bg-muted/20">
-        <div className={"flex " + getTypeStyle(item.type) + " items-center justify-center md:px-3 md:py-1 px-3 rounded"}>
+        <div
+          className={
+            "flex " +
+            getTypeStyle(item.type) +
+            " items-center justify-center md:px-3 md:py-1 px-3 rounded"
+          }
+        >
           {item.type === "Document" ? (
             <FileText className="h-6 w-6" />
           ) : mode === "folder" && item.id === selectedFolder?.id ? (

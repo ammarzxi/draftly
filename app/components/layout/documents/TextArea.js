@@ -66,11 +66,7 @@ const draftlyTheme = EditorView.theme({
     outline: "none",
   },
 });
-export default function MarkdownEditor({
-  input,
-  editable,
-  setInput,
-}) {
+export default function MarkdownEditor({ input, editable, setInput }) {
   return (
     <div className="overflow-hidden border border-border pt-4 w-full">
       <CodeMirror
