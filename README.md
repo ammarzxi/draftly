@@ -1,37 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Improvs
 
-## Getting Started
+Improvs is a document workspace I'm building with Next.js. The idea is to keep writing and organizing notes in one place, without making the app feel crowded.
 
-First, run the development server:
+## What it can do
+
+- Create documents and folders
+- Write and edit documents in Markdown
+- Preview Markdown while working
+- Keep documents inside folders
+- Star documents and folders
+- Browse recently updated documents
+- Move items to Trash, restore them, or delete them permanently
+
+## Built with
+
+- Next.js 16
+- React 19
+- Tailwind CSS 4
+- CodeMirror
+- React Markdown
+- Lucide React
+
+## Run it locally
+
+You'll need Node.js and npm installed.
 
 ```bash
+git clone https://github.com/ammarzxi/improvs.git
+cd improvs
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to use the app.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+To create a production build:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Project layout
 
-To learn more about Next.js, take a look at the following resources:
+```text
+app/
+├── components/
+│   ├── home/
+│   ├── layout/
+│   │   └── documents/
+│   ├── recents/
+│   ├── trash/
+│   └── ui/
+├── context/
+├── data/
+├── hooks/
+├── services/
+└── utils/
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+A quick look at where things live:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `components/` contains the app's pages and UI.
+- `context/GlobalVars.js` holds shared app state.
+- `services/items.js` contains the functions that add, update, delete, and restore items.
+- `hooks/useDocumentActions.js` keeps document and folder actions reusable.
+- `data/documents.js` provides the starting sample documents.
+- `utils/` contains small helper functions.
 
-## Deploy on Vercel
+## Where things stand
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The app currently keeps its data in React state, starting from the sample data in `app/data/documents.js`. Changes are available while the app is running, but they aren't saved to a database yet, so refreshing the page resets them.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# improvs
+Improvs is still being worked on. The structure and features will keep changing as I build it out.
