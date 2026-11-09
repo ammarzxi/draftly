@@ -72,4 +72,4 @@ A quick look at where things live:
 
 The app currently keeps its data in React state, starting from the sample data in `app/data/documents.js`. Changes are available while the app is running, but they aren't saved to a database yet, so refreshing the page resets them.
 
-Improvs is still being worked on. The structure and features will keep changing as I build it out.
+Draftly is still being worked on. The structure and features will keep changing as I build it out.
