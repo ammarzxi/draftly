@@ -1,8 +1,11 @@
 "use client";
 
+import { useGlobal } from "@/app/context/GlobalVars";
 import { Clock, House, Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+
 
 const links = [
   {
@@ -24,6 +27,7 @@ const links = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const {mode, setMode} = useGlobal();
 
   return (
     <aside className="max-w-45 px-2 hidden bg-muted/10 lg:block flex-1 pl-3">
@@ -41,6 +45,7 @@ export default function Sidebar() {
             <Link
               key={link.href}
               href={link.href}
+              onClick={() => setMode(null)}
               className={`flex text-sm items-center space-x-2 py-2 rounded-lg px-2 ${isActive ? "bg-primary/20 text-primary" : ""}`}
             >
               <Icon size={20} />
