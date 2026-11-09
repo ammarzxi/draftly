@@ -1,6 +1,6 @@
-# Improvs
+# Draftly
 
-Improvs is a document workspace I'm building with Next.js. The idea is to keep writing and organizing notes in one place, without making the app feel crowded.
+Draftly is a document workspace I'm building with Next.js. The idea is to keep writing and organizing notes in one place, without making the app feel crowded.
 
 ## What it can do
 
