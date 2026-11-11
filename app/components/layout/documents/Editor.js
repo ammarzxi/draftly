@@ -27,7 +27,7 @@ export default function Editor({
 
   return (
     <section
-      className={`min-w-0 border border-muted/40 xl:grid-cols-2 flex-1 overflow-hidden rounded-xl bg-white shadow-2xl ${mode === "write" || mode === "preview" || mode === "view" ? "grid grid-cols-1 absolute w-full" : "hidden"}`}
+      className={`min-w-0 border border-muted/40 xl:grid-cols-2 flex-1 overflow-hidden rounded-xl bg-background shadow-2xl ${mode === "write" || mode === "preview" || mode === "view" ? "grid grid-cols-1 absolute w-full" : "hidden"}`}
     >
       <div className="col-span-full border-b border-muted/40 flex justify-between p-3 flex-col">
         <div className="flex items-center justify-between">
@@ -38,7 +38,7 @@ export default function Editor({
               value={selectedDocument?.title ?? ""}
             />
           ) : (
-            <h2 className="border-none focus:outline-none font-heading text-lg font-bold">
+            <h2 className="border-none focus:outline-none font-heading text-lg text-foreground font-bold">
               {selectedDocument?.title}
             </h2>
           )}
@@ -89,11 +89,19 @@ export default function Editor({
         <TextArea editable={editable} input={input} setInput={onInputChange} />
       </div>
 
-      <div
-        className={`${mode === "preview" ? "block" : "hidden xl:block"} prose *:my-2 h-190 overflow-y-auto py-4 px-4`}
+     <div
+        className={`${mode === "preview" ? "block" : "hidden xl:block"} prose *:my-2 h-190 overflow-y-auto py-4 px-4 text-foreground
+        prose-headings:text-foreground
+        prose-strong:text-foreground
+        prose-a:text-primary
+        prose-p:text-muted-foreground
+        prose-li:text-muted-foreground
+        prose-blockquote:text-muted-foreground
+        prose-th:text-foreground
+        prose-td:text-muted-foreground`}
       >
         <Markdown remarkPlugins={[remarkGfm]}>{input}</Markdown>
-      </div>
-    </section>
+    </div>
+  </section>
   );
 }
