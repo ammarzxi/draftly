@@ -5,6 +5,7 @@ import { Clock, House, Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import Profile from "./Profile";
 
 const links = [
   {
@@ -29,13 +30,13 @@ export default function Sidebar() {
   const { mode, setMode } = useGlobal();
 
   return (
-    <aside className="max-w-45 px-2 hidden bg-muted/10 lg:block flex-1 pl-3">
+    <aside className="w-45 px-2 hidden bg-muted/10 lg:flex flex-col pl-3 min-h-screen">
       <div className="flex items-center gap-x-2 py-6">
         <Pencil size={25} />
         <span className="font-heading font-bold text-2xl">Draftly</span>
       </div>
 
-      <nav className="space-y-3">
+      <nav className="space-y-3 flex-1">
         {links.map((link) => {
           const Icon = link.icon;
           const isActive = pathname === link.href;
@@ -53,6 +54,10 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      <div className="mt-auto py-4">
+        <Profile />
+      </div>
     </aside>
   );
 }
