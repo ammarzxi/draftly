@@ -27,13 +27,27 @@ const supabase = createServerClient(
                 supabaseResponse.cookies.set(name, value, options)
                 );
 
-                Object.entries(headers).forEach(([key, value]) =>
+                Object.entries(headers ?? {}).forEach(([key, value]) =>
                     supabaseResponse.headers.set(key, value)
                 )
             }
         }
     }
 );
-await supabase.auth.getClaims();
-return supabaseResponse
+    const { data, error } = await supabase.auth.getClaims();
+
+    const pathname = request.nextUrl.pathname;
+
+    const publicRoutes = ["/login", "/signup"];
+
+    const isPublicRoute = publicRoutes.includes(pathname);
+    const isAuthenticated = !!data?.claims && !error;
+
+    if (!isAuthenticated && !isPublicRoute) {
+        return NextResponse.redirect(
+            new URL("/login", request.url)
+        );
+    }
+
+return supabaseResponse;
 }
