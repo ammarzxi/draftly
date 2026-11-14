@@ -1,12 +1,41 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { createClient } from "@/app/lib/supabase/client";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function handleLogin(event) {
+    event.preventDefault();
+
+    setError("");
+    setMessage("");
+    setLoading(true);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setError(error.message);
+      return;
+    } 
+    router.push("/");
+    router.refresh()
+  }
   return (
     <div className="w-full max-w-md">
       <div className="mb-8">
@@ -16,7 +45,7 @@ export default function LoginForm() {
         </p>
       </div>
 
-      <form className="space-y-5">
+      <form onSubmit={handleLogin} className="space-y-5">
         <div>
           <label className="text-sm font-medium">Email address</label>
           <input
@@ -39,11 +68,14 @@ export default function LoginForm() {
           />
         </div>
 
+        {error && <p className="text-sm text-red-500">{error}</p>}
+        {message && <p className="text-sm text-green-500">{message}</p>}
+
         <button
           type="submit"
           className="w-full rounded-lg bg-primary py-3 text-sm font-semibold text-white hover:opacity-90 transition"
         >
-          Log in
+          {loading ? "Logging In..." : "Log In"}
         </button>
       </form>
 
