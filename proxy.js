@@ -1,0 +1,11 @@
+import { updateSession } from "@/app/lib/supabase/proxy";
+
+export async function proxy(request) {
+    return await updateSession(request);
+}
+
+export const config = {
+    matcher: [
+        "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    ],
+};
