@@ -1,7 +1,7 @@
 "use client";
 
-import documentsData from "../data/documents";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import { createClient } from "@/app/lib/supabase/client";
 import {
   addItem,
   updateItem,
@@ -12,6 +12,7 @@ import {
   permanentlyDeleteItem,
   permanentlyDeleteFolderItem,
 } from "../services/items";
+import documentsData from "../data/documents";
 
 const GlobalContext = createContext(null);
 
@@ -26,9 +27,63 @@ export function useGlobal() {
 }
 
 export default function GlobalProvider({ children }) {
-  const [items, setItems] = useState(documentsData);
+  const [items, setItems] = useState([]);
   const [mode, setMode] = useState(null);
   const [addOpen, setAddOpen] = useState(false);
+
+  useEffect(() => {
+    async function fetchItems() {
+      const supabase = createClient();
+
+      const [documentsResult, foldersResult] = await Promise.all([
+        supabase.from("documents").select("*").order("updated_at", {ascending : false}),
+        supabase.from("folders").select("*").order("created_at", { ascending: false }),
+      ]);
+
+      if (documentsResult.error) {
+        console.log(documentsResult.error);
+        return
+      }
+
+      if (foldersResult.error) {
+        console.log(foldersResult.error);
+        return
+      }
+
+      const documents = documentsResult.data.map((document) => ({
+      id: document.id,
+      title: document.title,
+      type: "Document",
+      category: document.category,
+      folderId: document.folder_id,
+      color: "primary",
+      starred: false,
+      pinned: false,
+      createdAt: document.created_at,
+      updatedAt: document.updated_at,
+      deletedAt: document.deleted_at,
+      deleteId: null,
+      content: document.content,
+    }));
+
+    const folders = foldersResult.data.map((folder) => ({
+      id: folder.id,
+      title: folder.name,
+      type: "Folder",
+      folderId: null,
+      color: "yellow",
+      starred: false,
+      pinned: false,
+      createdAt: folder.created_at,
+      updatedAt: folder.created_at,
+      deletedAt: null,
+      deleteId: null,
+    }));
+
+    setItems([...folders, ...documents]);
+  }
+  fetchItems();
+  }, []);
 
   function createDocument(document) {
     setItems((prev) => addItem(prev, document));
