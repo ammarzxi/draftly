@@ -30,12 +30,14 @@ export default function DocumentWorkspace({ variant }) {
     ) || null;
 
   useEffect(() => {
+    
     if (selectedItemId && !selectedDocument) {
       setSelectedItemId(null);
       setInput("");
       setEditable(false);
       setMode("folder");
     }
+    
   }, [selectedItemId, selectedDocument, setMode]);
 
   function handleSelectDocument(doc) {
@@ -58,19 +60,19 @@ export default function DocumentWorkspace({ variant }) {
     }
   }
 
-  function handleTitleChange(title) {
-    if (selectedDocument?.type === "Folder") {
-      editFolder(selectedDocument.id, {
-        title,
-        updatedAt: new Date().toISOString(),
-      });
-    } else if (selectedDocument) {
-      editDocument(selectedDocument.id, {
-        title,
-        updatedAt: new Date().toISOString(),
-      });
-    }
+   function handleTitleChange(item, title) {
+  if (item.type === "Folder") {
+    editFolder(item.id, {
+      title,
+      updatedAt: new Date().toISOString(),
+    });
+  } else {
+    editDocument(item.id, {
+      title,
+      updatedAt: new Date().toISOString(),
+    });
   }
+}
 
   const Intro = variant === "recent" ? RecentsIntro : HomeIntro;
   const DocumentList = variant === "recent" ? RecentsList : List;
@@ -83,10 +85,12 @@ export default function DocumentWorkspace({ variant }) {
           <Intro />
           <DocumentList
             selectedFolder={selectedFolder}
+            selectedDocument={selectedDocument}
             setPopup={setPopup}
             popup={popup}
             setSelectedFolder={setSelectedFolderId}
             setEditable={setEditable}
+            onTitleChange={handleTitleChange}
             handleSelectDocument={handleSelectDocument}
             handleSelectFolder={handleSelectFolder}
           />
