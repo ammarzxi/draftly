@@ -15,6 +15,8 @@ export default function List({
   setSelectedFolder,
   setPopup,
   selectedFolder,
+  selectedDocument,
+  onTitleChange,
   setEditable,
 }) {
   const [activeFolder, setActiveFolder] = useState(null);
@@ -82,6 +84,8 @@ export default function List({
           folders={folders}
           mode={tab === "Recent" ? null : mode}
           selectedFolder={selectedFolder}
+          onTitleChange={onTitleChange}
+          selectedDocument={selectedDocument}
           popup={popup}
           setPopup={setPopup}
           actions={actions}
