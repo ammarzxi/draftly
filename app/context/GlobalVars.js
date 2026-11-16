@@ -85,44 +85,193 @@ export default function GlobalProvider({ children }) {
   fetchItems();
   }, []);
 
-  function createDocument(document) {
-    setItems((prev) => addItem(prev, document));
+  async function createDocument(document) {
+    const supabase = createClient();
+
+    const { data, error } = await supabase.from("documents").insert({
+      title: document.title,
+      content: "",
+      folder_id: document.folderId,
+    }).select().single();
+
+    if (error) {
+      console.log(error);
+      return false;
+    }
+
+     const newDocument = {
+        id: data.id,
+        title: data.title,
+        type: "Document",
+        category: data.category,
+        folderId: data.folder_id,
+        color: "primary",
+        starred: false,
+        pinned: false,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+        deletedAt: data.deleted_at,
+        deleteId: null,
+        content: data.content,
+    };
+
+    setItems((prev) => addItem(prev, newDocument));
+    return true;
   }
 
-  function createFolder(folder) {
-    setItems((prev) => addItem(prev, folder));
+  async function createFolder(folder) {
+    const supabase = createClient();
+
+    const { data, error } = await supabase.from("folders").insert({
+      name: folder.title
+    }).select().single();
+
+    if (error) {
+      console.log(error);
+      return false;
+    }
+
+     const newFolder = {
+        id: data.id,
+        title: data.name,
+        type: "Folder",
+        folderId: null,
+        color: "yellow",
+        starred: false,
+        pinned: false,
+        createdAt: data.created_at,
+        updatedAt: data.created_at,
+        deletedAt: null,
+        deleteId: null,
+    };
+
+    setItems((prev) => addItem(prev, newFolder));
+    return true;
   }
 
-  function editDocument(id, updates) {
-    setItems((prev) => updateItem(prev, id, "Document", updates));
+  async function editDocument(id, updates) {
+    const supabase = createClient();
+
+    const { error } = await supabase.from("documents").update({
+      content: updates.content,
+      updated_at: updates.updatedAt,
+      title: updates.title,
+    }).eq("id", id)
+
+    if (error) {
+      console.log(error);
+      return false;
+    }
+
+    setItems((prev) => updateItem(prev, id, "Document" ,updates));
+    
+    return true;
   }
 
-  function editFolder(id, updates) {
+  async function editFolder(id, updates) {
+    const supabase = createClient();
+
+    const {error} = await supabase.from("folders").update({
+      name: updates.title,
+    }).eq("id", id);
+    
+    if (error) {
+      console.log(error);
+      return false;
+    }
+
     setItems((prev) => updateItem(prev, id, "Folder", updates));
+    return true;
   }
 
-  function deleteDocument(id, deletedAt) {
-    setItems((prev) => softDeleteItem(prev, id, "Document", deletedAt));
+  async function deleteDocument(id, deletedAt) {
+    const supabase = createClient();
+
+    const { error } = await supabase
+    .from("documents")
+    .update({ deleted_at: deletedAt })
+    .eq("id", id);
+
+    if (error) {
+      console.log(error);
+      return false;
+    }
+
+    setItems((prev) => softDeleteItem(prev, id, "Document", deletedAt))
+    return true;
   }
 
-  function deleteFolder(id, deletedAt) {
+  async function deleteFolder(id, deletedAt) {
+    const supabase = createClient();
+    const { error } = await supabase.from("folders").update({ deleted_at: deletedAt }).eq("id", id);
+
+    if (error) {
+      console.log(error);
+      return false;
+    }
+
     setItems((prev) => deleteFolderItem(prev, id, deletedAt));
+    return true
   }
 
-  function restoreDocumentItem(id) {
+  async function restoreDocumentItem(id) {
+    const supabase = createClient();
+
+    const { error } = await supabase.from("documents").update({
+      deleted_at: null,
+    }).eq("id", id);
+
+    if (error) {
+      console.log(error);
+      return false;
+    }
+
     setItems((prev) => restoreItem(prev, id, "Document"));
+    return true;
   }
 
-  function restoreFolderItem(id) {
+ async function restoreFolderItem(id) {
+    const supabase = createClient();
+
+    const {error} = await supabase.from("folders").update({
+      deleted_at: null,
+    }).eq("id", id);
+
+    if (error) {
+      console.log(error);
+      return false;
+    }
+
     setItems((prev) => restoreFolderItems(prev, id));
+    return true;
   }
 
-  function permanentlyDeleteDocumentItem(id) {
+  async function permanentlyDeleteDocumentItem(id) {
+    const supabase = createClient();
+
+    const { error } = await supabase.from("documents").delete().eq("id", id);
+
+    if (error) {
+      console.log(error);
+      return false;
+    }
+
     setItems((prev) => permanentlyDeleteItem(prev, id, "Document"));
+    return true;
   }
 
-  function permanentlyDeleteFolder(id) {
+  async function permanentlyDeleteFolder(id) {
+    const supabase = createClient();
+
+    const {error} = await supabase.from("folders").delete().eq("id", id);
+
+    if (error) {
+      console.log(error);
+      return false;
+    }
+
     setItems((prev) => permanentlyDeleteFolderItem(prev, id));
+    return true;
   }
 
   return (
