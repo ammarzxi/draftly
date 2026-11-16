@@ -35,10 +35,22 @@ export default function useDocumentActions({
   }
 
   function handleEdit(item) {
-    handleSelectDocument(item);
-    setMode("write");
-    setEditable(true);
+    if (item.type === "Document") {
+      handleSelectDocument(item);
+      setMode("write");
+      setEditable(true);
+    }
   }
+
+ function handleRename(item) {
+  if (item.type === "Folder") {
+    handleSelectFolder(item);
+    setMode("FolRename");
+  } else if (item.type === "Document") {
+    handleSelectDocument(item);
+    setMode("DocRename");
+  }
+}
 
   function handleDelete(item) {
     const deletedAt = new Date().toISOString();
@@ -60,5 +72,5 @@ export default function useDocumentActions({
     }
   }
 
-  return { handleSelect, handleEdit, handleDelete, toggleStar };
+  return { handleSelect, handleEdit, handleRename, handleDelete, toggleStar };
 }
