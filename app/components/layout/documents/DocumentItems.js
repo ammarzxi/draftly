@@ -6,15 +6,18 @@ export default function DocumentItems({
   folders,
   mode,
   selectedFolder,
+  selectedDocument,
   popup,
   setPopup,
   actions,
+  onTitleChange,
   onAddDocument,
 }) {
   return items.map((item) => {
     const folder = folders.find((entry) => entry.id === item.folderId);
+  
     const folderDocs =
-      mode === "folder" && selectedFolder?.id === item.id
+      (mode === "folder" || mode === "FolRename" || mode === "DocRename") && selectedFolder?.id === item.id
         ? allItems.filter(
             (doc) =>
               doc.type === "Document" &&
@@ -34,18 +37,24 @@ export default function DocumentItems({
         setPopup={setPopup}
         onSelect={actions.handleSelect}
         onEdit={actions.handleEdit}
+        onTitleChange={onTitleChange}
         onDelete={actions.handleDelete}
+        selectedDocument={selectedDocument}
         onToggleStar={actions.toggleStar}
+        onRename={actions.handleRename}
         onAddDocument={onAddDocument}
       >
         {folderDocs.map((doc) => (
           <DocumentRow
             key={doc.id}
             item={doc}
+            selectedDocument={selectedDocument}
             mode={mode}
             selectedFolder={selectedFolder}
+            onTitleChange={onTitleChange}
             popup={popup}
             setPopup={setPopup}
+            onRename={actions.handleRename}
             onSelect={actions.handleSelect}
             onEdit={actions.handleEdit}
             onDelete={actions.handleDelete}
