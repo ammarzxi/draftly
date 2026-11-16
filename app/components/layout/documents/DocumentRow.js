@@ -9,6 +9,7 @@ import {
   Pencil,
   Plus,
   Star,
+  Tag,
   Trash,
 } from "lucide-react";
 import { useState } from "react";
@@ -21,9 +22,12 @@ export default function DocumentRow({
   mode,
   selectedFolder,
   popup,
+  onTitleChange,
   setPopup,
+  onRename,
   onSelect,
   onEdit,
+  selectedDocument,
   onDelete,
   onToggleStar,
   onAddDocument,
@@ -35,8 +39,10 @@ export default function DocumentRow({
     <div
       className="rounded relative"
       onClick={(event) => {
-        event.stopPropagation();
-        onSelect(item);
+          event.stopPropagation();
+          if (mode !== "FolRename" && mode !== "DocRename") {
+            onSelect(item);
+          };
       }}
     >
       {confirmDelete && (
@@ -63,7 +69,7 @@ export default function DocumentRow({
         >
           {item.type === "Document" ? (
             <FileText className="h-6 w-6" />
-          ) : mode === "folder" && item.id === selectedFolder?.id ? (
+          ) : (mode === "folder" || mode === "FolRename" || mode === "DocRename") && item.id === selectedFolder?.id ? ( 
             <ChevronDown className="h-6 w-6" />
           ) : (
             <Folder className="h-6 w-6" />
@@ -71,9 +77,22 @@ export default function DocumentRow({
         </div>
 
         <div className="flex flex-col w-full gap-y-0 min-w-0">
-          <h3 className="font-heading max-md:text-sm font-semibold truncate">
-            {item.title}
-          </h3>
+          {
+            (mode === "FolRename" && selectedFolder?.id === item.id) ||
+            // (mode === "FolRename" && selectedDocument?.id === item.id) ||
+            (mode === "DocRename" && selectedDocument?.id === item.id) ? (
+              <input
+                value={item.title}
+                onChange={(e) => onTitleChange(item, e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                className="border border-white"
+              />
+            ) : (
+              <h3 className="font-heading max-md:text-sm font-semibold truncate">
+                {item.title}
+              </h3>
+            )
+          }
           <div className="flex items-center justify-between w-full text-sm text-muted gap-x-2">
             <div className="flex items-center gap-x-0 min-w-0">
               <p className="hidden md:block truncate">
@@ -101,7 +120,7 @@ export default function DocumentRow({
                 />
               </button>
 
-              <div className="relative" data-popup-wrapper>
+              <div className="relative" data-popup-wrapper onClick={(e) => e.stopPropagation()}>
                 <button
                   type="button"
                   onClick={(event) => {
@@ -113,20 +132,31 @@ export default function DocumentRow({
                 </button>
 
                 {popup === item.id && (
-                  <div className="bg-white border border-muted/40 w-35 rounded-lg absolute right-0 z-50 p-2 cursor-pointer">
+                  <div className={`bg-background border border-muted/40 w-35 rounded-lg absolute right-0 z-50 p-2 cursor-pointer`} onClick={(e) => e.stopPropagation()}>
                     <button
-                      type="button"
+                      type="button" 
                       onClick={(event) => {
                         event.stopPropagation();
                         setPopup(null);
                         onEdit(item);
                       }}
-                      className="flex items-center gap-x-2 text-foreground w-full px-2 py-3 hover:bg-muted/20 rounded"
+                      className={`flex items-center gap-x-2 text-foreground w-full px-2 py-3 hover:bg-muted/20 rounded`}
                     >
                       <Pencil size={18} />
                       <span>Edit</span>
                     </button>
-
+                     <button
+                      type="button" 
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setPopup(null);
+                        onRename(item);
+                      }}
+                      className={`flex items-center gap-x-2 text-foreground w-full px-2 py-3 hover:bg-muted/20 rounded`}
+                    >
+                      <Tag size={18} />
+                      <span>Rename</span>
+                    </button>
                     {item.type === "Folder" && onAddDocument && (
                       <button
                         type="button"
