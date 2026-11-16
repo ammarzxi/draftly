@@ -49,5 +49,11 @@ const supabase = createServerClient(
         );
     }
 
+    if (isAuthenticated && isPublicRoute) {
+        return NextResponse.redirect(
+            new URL("/", request.url)
+        );
+    };
+
 return supabaseResponse;
 }
