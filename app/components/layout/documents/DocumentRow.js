@@ -132,7 +132,8 @@ export default function DocumentRow({
                 </button>
 
                 {popup === item.id && (
-                  <div className={`bg-background border border-muted/40 w-35 rounded-lg absolute right-0 z-50 p-2 cursor-pointer`} onClick={(e) => e.stopPropagation()}>
+                  <div className={`bg-background border border-muted/40 w-38 rounded-lg absolute right-0 z-50 p-2 cursor-pointer`} onClick={(e) => e.stopPropagation()}>
+                    { item.type !== "Folder" &&
                     <button
                       type="button" 
                       onClick={(event) => {
@@ -145,6 +146,7 @@ export default function DocumentRow({
                       <Pencil size={18} />
                       <span>Edit</span>
                     </button>
+                    }
                      <button
                       type="button" 
                       onClick={(event) => {
@@ -168,7 +170,7 @@ export default function DocumentRow({
                         className="flex items-center gap-x-2 text-foreground w-full px-2 py-3 hover:bg-muted/20 rounded"
                       >
                         <Plus size={18} />
-                        <span>Add Document</span>
+                        <span>Create</span>
                       </button>
                     )}
 
