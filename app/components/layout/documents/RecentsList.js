@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useGlobal } from "../../../context/GlobalVars";
@@ -10,9 +11,11 @@ export default function RecentsList({
   popup,
   setPopup,
   selectedFolder,
+  selectedDocument,
   setEditable,
+  onTitleChange,
 }) {
-  const { items } = useGlobal();
+  const { items, mode } = useGlobal();
 
   const actions = useDocumentActions({
     handleSelectFolder,
@@ -24,6 +27,7 @@ export default function RecentsList({
   const folders = items.filter(
     (item) => item.type === "Folder" && item.deletedAt === null,
   );
+
   const visibleItems = items
     .filter((item) => item.deletedAt === null)
     .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
@@ -37,27 +41,32 @@ export default function RecentsList({
   const today = visibleItems.filter(
     (item) => new Date(item.updatedAt) >= startOfToday,
   );
+
   const yesterday = visibleItems.filter((item) => {
     const updatedAt = new Date(item.updatedAt);
     return updatedAt >= startOfYesterday && updatedAt < startOfToday;
   });
+
   const earlier = visibleItems.filter(
     (item) => new Date(item.updatedAt) < startOfYesterday,
   );
 
   function renderGroup(group) {
-    return (
-      <DocumentItems
-        items={group}
-        folders={folders}
-        selectedFolder={selectedFolder}
-        popup={popup}
-        setPopup={setPopup}
-        actions={actions}
-      />
-    );
-  }
-
+  return (
+    <DocumentItems
+      items={group}
+      folders={folders}
+      selectedFolder={selectedFolder}
+      selectedDocument={selectedDocument}
+      mode={mode}
+      tab="Recent"
+      popup={popup}
+      setPopup={setPopup}
+      actions={actions}
+      onTitleChange={onTitleChange}
+    />
+  );
+}
   return (
     <section className="space-y-4 pt-4">
       {today.length > 0 && (
