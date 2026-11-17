@@ -81,8 +81,9 @@ export default function List({
         <DocumentItems
           items={visibleItems}
           allItems={items}
+          tab={tab}
           folders={folders}
-          mode={tab === "Recent" ? null : mode}
+          mode={mode}
           selectedFolder={selectedFolder}
           onTitleChange={onTitleChange}
           selectedDocument={selectedDocument}
