@@ -10,6 +10,7 @@ export default function DocumentItems({
   popup,
   setPopup,
   actions,
+  tab,
   onTitleChange,
   onAddDocument,
 }) {
@@ -17,7 +18,7 @@ export default function DocumentItems({
     const folder = folders.find((entry) => entry.id === item.folderId);
   
     const folderDocs =
-      (mode === "folder" || mode === "FolRename" || mode === "DocRename") && selectedFolder?.id === item.id
+      (mode === "folder" || mode === "DocRename") && selectedFolder?.id === item.id && tab !== "Recent"
         ? allItems.filter(
             (doc) =>
               doc.type === "Document" &&
@@ -42,6 +43,7 @@ export default function DocumentItems({
         selectedDocument={selectedDocument}
         onToggleStar={actions.toggleStar}
         onRename={actions.handleRename}
+        tab={tab}
         onAddDocument={onAddDocument}
       >
         {folderDocs.map((doc) => (
