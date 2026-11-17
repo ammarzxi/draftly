@@ -22,6 +22,7 @@ export default function DocumentRow({
   mode,
   selectedFolder,
   popup,
+  tab,
   onTitleChange,
   setPopup,
   onRename,
@@ -69,7 +70,7 @@ export default function DocumentRow({
         >
           {item.type === "Document" ? (
             <FileText className="h-6 w-6" />
-          ) : (mode === "folder" || mode === "FolRename" || mode === "DocRename") && item.id === selectedFolder?.id ? ( 
+          ) : (mode === "folder" || mode === "DocRename") && item.id === selectedFolder?.id && tab !== "Recent" ? ( 
             <ChevronDown className="h-6 w-6" />
           ) : (
             <Folder className="h-6 w-6" />
