@@ -5,6 +5,7 @@ import { useGlobal } from "../../../context/GlobalVars";
 import useDocumentActions from "../../../hooks/useDocumentActions";
 import AddDoc from "./AddDoc";
 import DocumentItems from "./DocumentItems";
+import { filterByTab } from "@/app/utils/documents";
 
 const buttons = ["All", "Recent", "Starred", "Folders"];
 
@@ -29,30 +30,10 @@ export default function List({
     setEditable,
     setPopup,
   });
-
-  const sortedItems = [...items].sort(
-    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
-  );
-
-  const filteredItems =
-    tab === "Recent"
-      ? sortedItems
-      : items.filter((item) => {
-          if (tab === "Folders") return item.type === "Folder";
-          if (tab === "Starred")
-            return item.type === "Document" && item.starred;
-          if (tab === "All")
-            return (
-              item.type === "Folder" ||
-              (item.type === "Document" && item.folderId == null)
-            );
-          return false;
-        });
-
-  const visibleItems = filteredItems.filter((item) => item.deletedAt === null);
   const folders = items.filter(
     (item) => item.type === "Folder" && item.deletedAt === null,
   );
+ const visibleItems = filterByTab(items, tab);
 
   return (
     <section className="space-y-4 pt-4">
