@@ -7,7 +7,22 @@ import AddDoc from "./documents/AddDoc";
 import ThemeToggle from "../ui/ThemeToggle";
 
 export default function Header() {
-  const { addOpen, setAddOpen } = useGlobal();
+  const { addOpen, setAddOpen, query, setQuery, items, setSearchDoc, setVariant} = useGlobal();
+
+  function handleQuery(query) {
+    setQuery(query);
+    let contentObjects = items.filter(
+  (item) => item.content?.length > 0 && item.type === "Document"
+);
+let targetDoc = contentObjects.filter((object) =>
+  object.content.toLowerCase().includes(query.toLowerCase())
+);
+
+let docIds = targetDoc.map((item) => item.id);
+
+    setSearchDoc(docIds);
+    setVariant("search");
+  };
 
   return (
     <>
@@ -17,8 +32,9 @@ export default function Header() {
           <input
             type="search"
             placeholder="Search documents..."
+            onChange={(e) => handleQuery(e.target.value)}
             className="text-sm bg-transparent w-full min-w-0 text-foreground placeholder:text-muted-foreground focus:outline-none"
-          />
+            />
         </div>
 
         <div className="flex items-center gap-x-2">
