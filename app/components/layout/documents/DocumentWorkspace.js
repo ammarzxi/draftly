@@ -5,17 +5,22 @@ import { useGlobal } from "../../../context/GlobalVars";
 import Editor from "./Editor";
 import List from "./List";
 import RecentsList from "./RecentsList";
+import SearchList from "./SearchList";
 import HomeIntro from "../../home/Intro";
 import RecentsIntro from "../../recents/Intro";
 import Header from "../Header";
+import { usePathname } from "next/navigation";
 
-export default function DocumentWorkspace({ variant }) {
-  const { items, setMode, editDocument, editFolder } = useGlobal();
+
+export default function DocumentWorkspace() {
+  const { items, setMode, editDocument, editFolder, variant, setVariant, query } = useGlobal();
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [input, setInput] = useState("");
   const [popup, setPopup] = useState(null);
   const [editable, setEditable] = useState(false);
+
+  const pathname = usePathname()
 
   const selectedDocument =
     items.find(
@@ -73,16 +78,27 @@ export default function DocumentWorkspace({ variant }) {
     });
   }
 }
-
-  const Intro = variant === "recent" ? RecentsIntro : HomeIntro;
-  const DocumentList = variant === "recent" ? RecentsList : List;
+useEffect(() => {
+  if (query?.length > 0) {
+    setVariant("search");
+  } else if (pathname === "/recents") {
+    setVariant("recent");
+  } else {
+    setVariant("home");
+  }
+}, [pathname, query, setVariant]);
+  const DocumentList = variant === "recent" ? RecentsList : variant === "search" ? SearchList : List;
 
   return (
     <main className="p-4">
       <Header />
       <div className="grid grid-cols-1 pt-6 gap-x-4 h-fit items-start relative">
         <div className="py-4">
-          <Intro />
+          {
+          variant === "home" ?
+          <HomeIntro />
+           : <RecentsIntro />
+          }
           <DocumentList
             selectedFolder={selectedFolder}
             selectedDocument={selectedDocument}
