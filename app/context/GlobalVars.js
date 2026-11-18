@@ -30,6 +30,9 @@ export default function GlobalProvider({ children }) {
   const [items, setItems] = useState([]);
   const [mode, setMode] = useState(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [query, setQuery] = useState(null);
+  const [searchDoc, setSearchDoc] = useState(null);
+  const [variant, setVariant] = useState(null);
 
   useEffect(() => {
     async function fetchItems() {
@@ -57,7 +60,7 @@ export default function GlobalProvider({ children }) {
       category: document.category,
       folderId: document.folder_id,
       color: "primary",
-      starred: false,
+      starred: document.starred,
       pinned: false,
       createdAt: document.created_at,
       updatedAt: document.updated_at,
@@ -72,7 +75,7 @@ export default function GlobalProvider({ children }) {
       type: "Folder",
       folderId: null,
       color: "yellow",
-      starred: false,
+      starred: folder.starred,
       pinned: false,
       createdAt: folder.created_at,
       updatedAt: folder.created_at,
@@ -156,6 +159,7 @@ export default function GlobalProvider({ children }) {
       content: updates.content,
       updated_at: updates.updatedAt,
       title: updates.title,
+      starred: updates.starred,
     }).eq("id", id)
 
     if (error) {
@@ -173,6 +177,7 @@ export default function GlobalProvider({ children }) {
 
     const {error} = await supabase.from("folders").update({
       name: updates.title,
+      starred: updates.starred,
     }).eq("id", id);
     
     if (error) {
@@ -283,6 +288,8 @@ export default function GlobalProvider({ children }) {
         addOpen,
         setAddOpen,
         createDocument,
+        query,
+        setQuery,
         createFolder,
         editDocument,
         editFolder,
@@ -292,6 +299,10 @@ export default function GlobalProvider({ children }) {
         restoreFolderItem,
         permanentlyDeleteDocumentItem,
         permanentlyDeleteFolderItem: permanentlyDeleteFolder,
+        searchDoc,
+        setSearchDoc,
+        setVariant,
+        variant,
       }}
     >
       {children}
