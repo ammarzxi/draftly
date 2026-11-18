@@ -23,3 +23,25 @@ export function getRelativeTime(date) {
 
   return "Updated just now";
 }
+export function filterByTab(items, tab) {
+  const sortedItems = [...items].sort(
+    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+  );
+
+  const filteredItems =
+    tab === "Recent"
+      ? sortedItems
+      : items.filter((item) => {
+          if (tab === "Folders") return item.type === "Folder";
+          if (tab === "Starred")
+            return item.starred;
+          if (tab === "All")
+            return (
+              item.type === "Folder" ||
+              (item.type === "Document" && item.folderId == null)
+            );
+          return false;
+        });
+
+  return filteredItems.filter((item) => item.deletedAt === null);
+}
