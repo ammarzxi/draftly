@@ -79,15 +79,18 @@ export default function DocumentWorkspace() {
   }
 }
 useEffect(() => {
-  if (query?.length > 0) {
-    setVariant("search");
-  } else if (pathname === "/recents") {
+  if (pathname === "/recents") {
     setVariant("recent");
-  } else {
+  } else if (pathname === "/trash") {
+    setVariant("trash")
+  } else if (pathname === "/") {
     setVariant("home");
+  } else if (query?.length > 0) {
+    setVariant("search");
   }
 }, [pathname, query, setVariant]);
-  const DocumentList = variant === "recent" ? RecentsList : variant === "search" ? SearchList : List;
+console.log(variant)
+  const DocumentList = variant === "recent" ? RecentsList : variant === "search" ? SearchList : variant === "trash" ? <SearchList variant={"trash"} /> : List;
 
   return (
     <main className="p-4">

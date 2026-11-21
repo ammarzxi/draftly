@@ -79,7 +79,7 @@ export default function GlobalProvider({ children }) {
       pinned: false,
       createdAt: folder.created_at,
       updatedAt: folder.created_at,
-      deletedAt: null,
+      deletedAt: folder.deleted_at,
       deleteId: null,
     }));
 
@@ -216,7 +216,7 @@ export default function GlobalProvider({ children }) {
     }
 
     setItems((prev) => deleteFolderItem(prev, id, deletedAt));
-    return true
+    return true;
   }
 
   async function restoreDocumentItem(id) {
