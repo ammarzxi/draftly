@@ -115,7 +115,7 @@ export default function DocumentWorkspace() {
             selectedDocument={selectedDocument}
             setPopup={setPopup}
             popup={popup}
-            variant={displayVariant === "search" ? "search" : page}
+            variant={page === "trash" ? "trash" : displayVariant}
             setSelectedFolder={setSelectedFolderId}
             setEditable={setEditable}
             onTitleChange={handleTitleChange}
