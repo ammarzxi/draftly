@@ -52,10 +52,10 @@ export default function SearchList({
   );
 
   const docObjects = filterByTab(
-    items.filter((item) => searchDoc.includes(item.id)),
+    items.filter((item) => searchDoc?.includes(item.id)),
     tab,
   );
-
+  const trashObjects = items.filter((item) => searchDoc?.includes(item.id) && item.deletedAt !== null);
   const deletedItems = items.filter((item) => {
     if (item.deletedAt == null) return false;
 
@@ -72,7 +72,6 @@ export default function SearchList({
 
     return true;
   });
-
   const foldersData = items.filter((item) => item.type === "Folder");
 
   function handleDelete(item) {
@@ -132,11 +131,10 @@ export default function SearchList({
           onConfirm={confirmAction}
         />
       )}
-
       {variant === "trash" ? (
         <>
           <div className="space-y-4">
-            {deletedItems.map((item) => {
+            {(query?.length > 0 ? trashObjects : deletedItems).map((item) => {
               const folder = foldersData.find(
                 (entry) => entry.id === item.folderId,
               );
@@ -226,8 +224,7 @@ export default function SearchList({
               );
             })}
           </div>
-
-          {deletedItems.length === 0 && (
+          {(query?.length > 0 ? trashObjects.length === 0 : deletedItems.length === 0) && (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <Trash2 size={40} className="text-muted-foreground mb-3" />
               <h3 className="font-heading font-semibold text-lg">
@@ -239,7 +236,7 @@ export default function SearchList({
             </div>
           )}
         </>
-      ) : (
+      ) :  (
         <>
           <DocumentItems
             items={docObjects}
@@ -253,12 +250,23 @@ export default function SearchList({
             actions={actions}
             onTitleChange={onTitleChange}
           />
-
-          {docObjects.length === 0 && query.length !== 0 && (
+          {(docObjects.length === 0 && trashObjects.length === 0) && query.length !== 0 && (
             <div>
               <h3>Couldn't find any documents with this query!</h3>
             </div>
           )}
+
+          {
+           (query || "").trim().length === 0 && (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <Dot size={40} className="text-muted-foreground mb-3" />
+                <h3 className="font-heading font-semibold text-lg"> Search can't be empty! </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Please enter a query to search for documents and folders.
+                </p>
+              </div>
+            )
+          }
         </>
       )}
     </section>

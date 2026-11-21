@@ -5,21 +5,26 @@ import { Bell, Plus, Search } from "lucide-react";
 import { useGlobal } from "../../context/GlobalVars";
 import AddDoc from "./documents/AddDoc";
 import ThemeToggle from "../ui/ThemeToggle";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const { addOpen, setAddOpen, query, setQuery, items, setSearchDoc, setVariant} = useGlobal();
+  const pathname = usePathname();
 
   function handleQuery(query) {
     setQuery(query);
+    
     let contentObjects = items.filter(
-  (item) => item.content?.length > 0 && item.type === "Document"
-);
-let targetDoc = contentObjects.filter((object) =>
-  object.content.toLowerCase().includes(query.toLowerCase())
-);
+       (item) => item.content?.length > 0 && item.type === "Document"
+    );
+    let targetDoc = contentObjects.filter((object) =>
+      object.content.toLowerCase().includes(query.toLowerCase())
+  );
+    let trashDoc = contentObjects.filter((object) =>
+      object.deletedAt !== null && object.content.toLowerCase().includes(query.toLowerCase())
+    );
 
-let docIds = targetDoc.map((item) => item.id);
-
+    let docIds = pathname === "/trash" ? trashDoc?.map((doc) => doc.id) : targetDoc?.map((doc) => doc.id);
     setSearchDoc(docIds);
     setVariant("search");
   };

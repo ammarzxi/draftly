@@ -8,12 +8,13 @@ import RecentsList from "./RecentsList";
 import SearchList from "./SearchList";
 import HomeIntro from "../../home/Intro";
 import RecentsIntro from "../../recents/Intro";
+import TrashIntro from "../../trash/Intro";
 import Header from "../Header";
 import { usePathname } from "next/navigation";
 
 
 export default function DocumentWorkspace() {
-  const { items, setMode, editDocument, editFolder, variant, setVariant, query } = useGlobal();
+  const { items, setMode, editDocument, editFolder, variant, setVariant, query, setQuery } = useGlobal();
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [input, setInput] = useState("");
@@ -78,19 +79,26 @@ export default function DocumentWorkspace() {
     });
   }
 }
-useEffect(() => {
-  if (pathname === "/recents") {
-    setVariant("recent");
-  } else if (pathname === "/trash") {
-    setVariant("trash")
-  } else if (pathname === "/") {
-    setVariant("home");
-  } else if (query?.length > 0) {
-    setVariant("search");
-  }
-}, [pathname, query, setVariant]);
-console.log(variant)
-  const DocumentList = variant === "recent" ? RecentsList : variant === "search" ? SearchList : variant === "trash" ? <SearchList variant={"trash"} /> : List;
+
+ const page = pathname === "/trash"
+  ? "trash"
+  : pathname === "/recents"
+    ? "recent"
+    : "home";
+  const displayVariant = query?.trim() ? "search" : page;
+
+  const DocumentList =
+  displayVariant === "search" || page === "trash"
+    ? SearchList
+    : page === "recent"
+      ? RecentsList
+      : List;
+
+    useEffect(() => {
+      if (query?.length !== 0) {
+        setQuery(null)
+      }
+    },[pathname]);
 
   return (
     <main className="p-4">
@@ -98,15 +106,16 @@ console.log(variant)
       <div className="grid grid-cols-1 pt-6 gap-x-4 h-fit items-start relative">
         <div className="py-4">
           {
-          variant === "home" ?
+          pathname === "/" ?
           <HomeIntro />
-           : <RecentsIntro />
+           : pathname === "/recents" ? <RecentsIntro /> : pathname === "/trash" ? <TrashIntro /> : null
           }
           <DocumentList
             selectedFolder={selectedFolder}
             selectedDocument={selectedDocument}
             setPopup={setPopup}
             popup={popup}
+            variant={displayVariant === "search" ? "search" : page}
             setSelectedFolder={setSelectedFolderId}
             setEditable={setEditable}
             onTitleChange={handleTitleChange}
